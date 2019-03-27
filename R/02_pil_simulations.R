@@ -158,12 +158,23 @@ nit <- 1
     stop("Check values in ass.sc")
   
   
-  # HCRs: same trigger points required for HCR1 and HCR2 (i.e. Bloss, Blim, Flow, Flow and Fmsy)
+  # HCRs: trigger points required for HCR1 and HCR2 (i.e. Bloss, Blim, Floss, Flow and Fmsy)
   
   advice.ctrl[["PIL"]]$rule    <- rule.sc
   
-  if(any(!c("Bloss","Blim","Flow","Fmsy", "Floss") %in% rownames(advice.ctrl$PIL$ref.pts)))
-    stop("Required reference points missing")
+  if (rule.sc==1) {
+    
+    if(any(!c("Bloss","Blim","Floss","Fmsy") %in% rownames(advice.ctrl$PIL$ref.pts)))
+      stop("Required reference points missing: Bloss, Blim, Floss, Fmsy")
+    
+  } else if (rule.sc==1) {
+    
+    if(any(!c("Bloss","Blim","Flow","Fmsy") %in% rownames(advice.ctrl$PIL$ref.pts)))
+      stop("Required reference points missing: Bloss, Blim, Flow, Fmsy")
+    
+  } else
+    
+    stop("Check values in rule.sc")
   
   
   # RECRUITMENT
@@ -271,9 +282,9 @@ source("./R/fun/MP_HCR_IBpil.R")
 # source("./R/fun/PILassess.R")
 # source("./R/fun/ss32flbeia.R")
 
-proj.obj <- FLBEIA( biols = biols, SRs = SRs, fleets = fleets, covars = NULL, indices = NULL, advice = advice, 
+proj.obj <- FLBEIA( biols = biols, SRs = SRs, fleets = fleets, covars = covars, indices = indices, advice = advice, 
                     main.ctrl = main.ctrl, biols.ctrl = biols.ctrl,  fleets.ctrl = fleets.ctrl, 
-                    covars.ctrl = NULL, obs.ctrl = obs.ctrl, assess.ctrl = assess.ctrl, advice.ctrl = advice.ctrl)
+                    covars.ctrl = covars.ctrl, obs.ctrl = obs.ctrl, assess.ctrl = assess.ctrl, advice.ctrl = advice.ctrl)
 
 
 assign(scenario, proj.obj)
@@ -301,7 +312,7 @@ assign( paste(scenario,"risk",sep="_"), riskSum(proj.obj, Bpa=c(PIL=advice.ctrl$
 out.obj <- c( scenario, paste( scenario, c("bio","flt","fltstk","adv","risk"), sep="_"))
 
 out.name      <- paste("out2018_",scenario,"_",it,".RData",sep="")
-out.file      <- file.path("output",out.name)
+out.file      <- file.path("output/output_iters",out.name)
 
 cat("Saving objects in: ",out.file,"\n")
 save(list=out.obj, file=out.file)
