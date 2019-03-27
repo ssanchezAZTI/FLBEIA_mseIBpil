@@ -680,8 +680,8 @@ for (st in stks) advice.ctrl[[st]] <- list()
 advice.ctrl[["PIL"]]$HCR.model <- "pilHCRs"
 
 advice.ctrl[["PIL"]]$nyears      <- 2
-advice.ctrl[["PIL"]]$wts.nyears  <- 1
-advice.ctrl[["PIL"]]$fbar.nyears <- 1 #! need to expand it in the simulations (e.g. "all")
+advice.ctrl[["PIL"]]$wts.nyears  <- 3
+advice.ctrl[["PIL"]]$fbar.nyears <- 3
 #! alternative fit new SRR or adopt one
 #advice.ctrl[["PIL"]]$f.rescale <- FALSE # Default
 
