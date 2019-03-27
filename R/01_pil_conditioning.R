@@ -6,8 +6,8 @@
 #   modified: Laura Wise (assessment WGHANSA2018)                            #
 ################################################################################
 
-# ibpil_conditioning_2018.r - MSE conditioning and settings
-# msePIL8c9a/ibpil_conditioning_2018.r
+# 01_pil_conditioning.r - MSE conditioning and settings
+# FLBEIA_mseIBpil/01_pil_conditioning.r
 
 # Copyright: AZTI, 2018
 # Author: Sonia Sanchez (AZTI) (<ssanchez@azti.es>)
@@ -24,7 +24,7 @@
 # - PROJECTION PERIOD values:
 #   ~ @mat     : mean 2012-2017 (0 for age 0 and 1 for the rest)
 #   ~ @stock.wt: mean 2012-2017 
-#   ~ @catch.wt: mean 2012-2017 
+#   ~ @catch.wt: mean 2015-2017 
 #   ~ @catch.q : mean 2012-2017 
 
 #==============================================================================
@@ -217,11 +217,12 @@ Flim <- 0.250
 Bpa  <- 446331 
 Blim <- 337448 
 Bloss <- 112943
-Fmsy <- 0.120 
-Flow <- 0.10
+Fmsy <- 0.120
+Floss <- 0.10 #for rule 1 when B1+ above Bloss
+Flow <- 0.085 #for rule 2 when B1+ above Bloss
 Bmsy <- 385038
 
-PIL_ref.pts <- c( Fpa=Fpa, Flim=Flim, Flow=Flow, Bpa=Bpa, Blim=Blim, Fmsy=Fmsy, Bmsy=Bmsy, Bloss=Bloss)
+PIL_ref.pts <- c( Fpa=Fpa, Flim=Flim, Floss= Floss, Flow=Flow, Bpa=Bpa, Blim=Blim, Fmsy=Fmsy, Bmsy=Bmsy, Bloss=Bloss)
 
 #==============================================================================
 # BIOLS CONTROLS                                                           ----
@@ -455,10 +456,8 @@ catch.q(fleets[["INT"]]@metiers[["ALL"]]@catches[["PIL"]])[is.infinite(catch.q(f
 # Projection period
 #============================================================================
 
-# Values set as the mean of the last 6 years (mean.yrs = hl6.yr)
-
 # - Weights at age in the catch (=landings, as no discards): 
-#    mean 2012-2017 (last 6 years)
+#    mean 2015-2017 (last 3 years)
 myrs <- ac(2015:2017)
 # statistics
 PILcwa.mean <- yearMeans(landings.wt(fleets$INT@metiers$ALL@catches$PIL)[,myrs,])
@@ -578,28 +577,18 @@ obs.ctrl_perf <- create.obs.ctrl(stksnames = stks,  stkObs.models = stkObs.model
 
 
 # # - Observation (--> errors in biological + fleet information + indices):
-#obs.ctrl_SS3 <- create.obs.ctrl(stksnames = stks,flq.PIL=flq.PIL,stkObs.models = 'age2ageDat')
 obs.ctrl_SS3 <- create.obs.ctrl(stksnames = stks,flq.PIL=flq.PIL)
 
 obs.ctrl_SS3$PIL$indObs <- list(AcousticNumberAtAge = list(indObs.model = "ageInd"),
                                 DEPM = list(indObs.model = "bioInd"))
 obs.ctrl_SS3$PIL$obs.curryr <- TRUE
 
-#obs.ctrl_SS3[["PIL"]]$stkObs$TAC.ovrsht <- FLQuant(dimnames = list(year = first.yr:last.yr, unit = PIL.unit,
-#season = 1:ns, iter = 1:ni))
-# slts <- c("nmort.error", "fec.error", "land.wgt.error", "stk.nage.error", "stk.wgt.error",
-#           "disc.wgt.error", "land.nage.error", "disc.nage.error")
-#  for(sl in slts){
-#   obs.ctrl_SS3[["PIL"]]$stkObs[[sl]]   <- get(sl)
-#   obs.ctrl_SS3[["PIL"]]$stkObs[[sl]][] <- rnorm(prod(dim(flq)),1,.1)
-# }
-
-#index.q for our case (is this right???)
-indices_ss3$AcousticNumberAtAge@index.q[,] <- c(0,rep(1.31,6))
+indices_ss3$AcousticNumberAtAge@index.q[,] <- c(0,rep(1.32,6))
 indices_ss3$DEPM@index.q[] <- 1.13
-#last_DEPM<-2017
-#noDEPMyears <- an(proj.yrs)[(((an(proj.yrs)-last_DEPM)-3)/3)%%1!=0]
-#indices_ss3$DEPM@index.q[,ac(noDEPMyears),]<-NA
+
+last_DEPM<-2017
+noDEPMyears <- an(proj.yrs)[(((an(proj.yrs)-last_DEPM)-3)/3)%%1!=0]
+indices_ss3$DEPM@index.q[,ac(noDEPMyears),]<-NA
 
 #==============================================================================
 # ASSESSMENT CONTROLS                                                      ----
@@ -655,7 +644,7 @@ PIL_advice.TAC.flq[,ac(c(1990,1992,1994:1998)),] <- NA # no ICES advice
 PIL_advice.TAC.flq[,ac(c(1987:1989,1991,1993,1999:2017)),] <- c(140000,150000,212000,176000,135000,38000,81000,
                                                                 88000,95000,100000,128000,106000,96000,114000,
                                                                 92000,71000,75000,75000,36000,55000,17000,16000,12000,23000)  # ICES #advice
-PIL_advice.TAC.flq[,ac(2018),] <- c(14600) #! in 2018 
+PIL_advice.TAC.flq[,ac(2018),] <- c(14600)
 
 PIL_advice.quota.share.flq <- FLQuant( 1, dimnames=list(quant=stks,year=first.yr:last.yr), iter=ni)
 PIL_advice.avg.yrs         <- c(2013:2017)
@@ -682,6 +671,7 @@ advice.ctrl[["PIL"]]$HCR.model <- "pilHCRs"
 advice.ctrl[["PIL"]]$nyears      <- 2
 advice.ctrl[["PIL"]]$wts.nyears  <- 3
 advice.ctrl[["PIL"]]$fbar.nyears <- 3
+
 #! alternative fit new SRR or adopt one
 #advice.ctrl[["PIL"]]$f.rescale <- FALSE # Default
 
