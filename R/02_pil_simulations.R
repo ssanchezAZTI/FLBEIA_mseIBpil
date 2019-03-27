@@ -52,6 +52,8 @@ load(file.path("input","PIL_input2018.RData"))
 t1 <- Sys.time()
 
 
+# get the job id from the environment
+it <- as.numeric(Sys.getenv("SGE_TASK_ID")) #it <- 1
 cat("Starting run i = ",it,"\n")
 
 # Set seed for reproducible results:
@@ -177,6 +179,8 @@ nit <- 1
     
     SRs <- SRs_LOW
     unc.yrs <- ac(2006:2017)
+    
+    advice.ctrl$PIL$ref.pts["Blim",] <- Blow # different Blim
     
   # } else if (rec.sc=="lowmed"){
   #   

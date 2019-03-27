@@ -259,7 +259,7 @@ pilsr <- fmle(pilsr, fixed=list(a=c(params_med)[1],b=PIL_ref.pts[["Blim"]]))
 # dev.off()
 
 # Segmented regression (inflexion point at Blow for low productivity scenario)
-blow <- 196334 #change point of Hockey stick for the low productivity 
+Blow <- 196334 #change point of Hockey stick for the low productivity 
 
 pilsr2 <- FLSR(rec=pil@n[1,], ssb=ssb(pil))
 
@@ -268,11 +268,11 @@ pilsr2@rec[,ac(ass.yr),] <- NA  # remove REC estimate for assessment year (11069
 model(pilsr2) <- segreg()
 
 yrs.srlow <- 2006:2017
-params_low <- fmle(window(pilsr2, start=2006, end=2017), fixed=list(b=blow))@params 
+params_low <- fmle(window(pilsr2, start=2006, end=2017), fixed=list(b=Blow))@params 
 
-pilsr2 <- fmle(pilsr2, fixed=list(a=c(params_low)[1],b=blow))
+pilsr2 <- fmle(pilsr2, fixed=list(a=c(params_low)[1],b=Blow))
 
-# pdf(paste(wd_plot,"PIL_srr_blow.pdf",sep=""))
+# pdf(paste(wd_plot,"PIL_srr_Blow.pdf",sep=""))
 # plot(pilsr2, main="Segmented regression \n(inflex. at Blow)")
 # #Profile the likelihood to check the fit
 # profile(pilsr2, main="Segmented regression \n(inflex. at Blow)")
@@ -289,7 +289,7 @@ params_med
 
 yrs.srmix <- 1993:2017
 
-pilsr3 <- fmle(pilsr3, fixed=list( a=c(params_low)[1], b=blow, 
+pilsr3 <- fmle(pilsr3, fixed=list( a=c(params_low)[1], b=Blow, 
                                    A=c(params_med)[1], B=PIL_ref.pts[["Blim"]]))
 
 
@@ -736,7 +736,7 @@ save( biols, SRs_MED, SRs_LOW, SRs_MIX, yrs.srmed, yrs.srlow, yrs.srmix,
       obs.ctrl_perf, obs.ctrl_SS3, #obs.ctrl, 
       # PILstwa_obs.varlog, PILmat_obs.varlog, PILcwa_obs.varlog
       assess.ctrl_perf, assess.ctrl_emul, assess.ctrl_SS3, #assess.ctrl, 
-      advice.ctrl, 
+      advice.ctrl, Blow,
       PILqa.cv,PILqa.mean,
       # PILstwa_pop.varlog, PILmat_pop.varlog, PILcwa_pop.varlog
       file=paste(wd_in,"PIL_input2018.RData",sep=""))
