@@ -24,7 +24,7 @@
 # HCR1: Preferred F
 #  F advice depending on SSB in relation to Btrigger points is:
 #      - 0    ,        0 < SSB <= Bloss
-#      - Flow ,     Bloss < SSB <= 0.8*Blim
+#      - Floss ,     Bloss < SSB <= 0.8*Blim
 #      - Fmsy , 0.8*Blim < SSB 
 # 
 #
@@ -41,9 +41,9 @@
 #-------------------------------------------------------------------------------
 
 
-# Fmsy <- 0.12; Flow <- 0.10; Flow <- 0.085
+# Fmsy <- 0.12; Floss <- 0.10; Flow <- 0.085
 # Blim <- 337448
-# Bloss <- 196334
+# Blow <- 196334
 # Bloss <- 112943
 # B1plus <- Bloss
 # ((Fmsy-Flow)/(Blim-Bloss))*B1plus + (-(Fmsy-Flow)*Bloss/(Blim-Bloss)+Flow)
@@ -68,8 +68,7 @@ pilHCRs <- function(stocks, advice, advice.ctrl, year, season, stknm,...){
 
   if (rule %in% c(0:2)) {
     
-    stk <- window(stk, start=yrsnumbs[1], end=yrsnumbs[year-1]) #! CHECK WHEN ASSESSMENT USED
-    cat("start year ",yrsnumbs[1]," end year", yrsnumbs[year-1], "\n")
+    stk <- window(stk, start=yrsnumbs[1], end=yrsnumbs[year]) #! CHECK WHEN ASSESSMENT USED
     
     # Short Term Forecast (STF)
     
@@ -108,10 +107,6 @@ pilHCRs <- function(stocks, advice, advice.ctrl, year, season, stknm,...){
       }}else{
         stk <- stfBD(stk, nyears = 2, wts.nyears = wts.nyears, fbar.nyears = fbar.nyears)}
     
-    cat("stock size in stf:\n")
-    print(ssb(stk))
-    cat("\n")
-    
     # Build fwd.ctrl
     int.yr <- advice.ctrl[[stknm]]$intermediate.year
     
@@ -123,12 +118,6 @@ pilHCRs <- function(stocks, advice, advice.ctrl, year, season, stknm,...){
         fwd.ctrl <- fwdControl(data.frame(year = c(assyrnumb),  val = c(1), quantity = c('f'), rel.year = c(assyrnumb-1)))
       else
         fwd.ctrl <- fwdControl(data.frame(year = c(assyrnumb),  val = c(advice$TAC[stknm,year, drop=TRUE][i]), quantity = c('catch')))
-      
-      cat("TAC in fwd.ctrl: ",c(advice$TAC[stknm,year, drop=TRUE][i]),"\n")
-      cat("year of fwd.ctrl: ",assyrnumb,"\n")
-      cat("fwd.ctrl for stf:\n ")
-      print(fwd.ctrl)
-      cat("\n")
 
       stki <- iter(stk, i)
       
@@ -219,7 +208,7 @@ pilHCRs <- function(stocks, advice, advice.ctrl, year, season, stknm,...){
       
       # Find where the SSB (Age structured) OR Biomass (Aggregated) in relation to Btrig points.
       b.pos <- apply(matrix(1:iter,1,iter),2, function(i) findInterval(b.datyr[i], Brefs[,i]))  # [it]
-      Ftg   <- ifelse(b.pos == 0, 0, ifelse(b.pos == 1, ref.pts['Flow',], ref.pts['Fmsy',]))
+      Ftg   <- ifelse(b.pos == 0, 0, ifelse(b.pos == 1, ref.pts['Floss',], ref.pts['Fmsy',]))
     
       
     } else if (rule == 2) { # HCR2: Increased F
@@ -240,10 +229,7 @@ pilHCRs <- function(stocks, advice, advice.ctrl, year, season, stknm,...){
       Ftg   <- ifelse(b.pos == 0, 0, ifelse(b.pos == 1,(Flow-(Fmsy-Flow)*Bloss/(Blim-Bloss)) + 
                                                         ((Fmsy-Flow)/(Blim-Bloss))*b.datyr, Fmsy))
     }
-    
-      cat("F for rule", rule, ": ", Ftg, "\n")
-      cat("Biomass for this F: ", b.datyr, "\n")
-      
+        
       # Fill the 0-s and NA-s with almost 0 values to avoid problems when the fishery is closed for example, or there is no catch...
       stk@harvest[stk@harvest < 0] <- 0.00001
 
@@ -273,7 +259,7 @@ pilHCRs <- function(stocks, advice, advice.ctrl, year, season, stknm,...){
       
       for(i in 1:iter){
         
-        if(rule == 1 & Ftg[i]==ref.pts['Flow',]){
+        if(rule == 1 & Ftg[i]==ref.pts['Floss',]){
           fwd.ctrl <- fwdControl(data.frame(year = c(assyrnumb+1), quantity = c('f','ssb'),rel.year=c(NA,assyrnumb)))
           fwd.ctrl@trgtArray <- array(NA, dim = c(2, 3, 1:iter), dimnames=list(rep(assyrnumb+1,2), c("min","val","max"),iter=1:iter))
           #Set f 
@@ -327,8 +313,7 @@ pilHCRs <- function(stocks, advice, advice.ctrl, year, season, stknm,...){
           }
           
           stki <- fwd(stki, ctrl = fwd.ctrl, sr = list(model = sr.model, params = sr1))
-          cat("na fwd final: \n")
-          print(fwd.ctrl)
+
         }
         else{
           
