@@ -41,8 +41,6 @@ library(reshape2)
 #==============================================================================
 
 load(file.path("input","PIL_input2018.RData"))
-# load(file.path("data","pil_stf.RData"))
-
 
 #==============================================================================
 
@@ -160,11 +158,11 @@ nit <- 1
     stop("Check values in ass.sc")
   
   
-  # HCRs: same trigger points required for HCR1 and HCR2 (i.e. Bloss, Blim, Flow and Fmsy)
+  # HCRs: same trigger points required for HCR1 and HCR2 (i.e. Bloss, Blim, Flow, Flow and Fmsy)
   
   advice.ctrl[["PIL"]]$rule    <- rule.sc
   
-  if(any(!c("Bloss","Blim","Flow","Fmsy") %in% rownames(advice.ctrl$PIL$ref.pts)))
+  if(any(!c("Bloss","Blim","Flow","Fmsy", "Floss") %in% rownames(advice.ctrl$PIL$ref.pts)))
     stop("Required reference points missing")
   
   
@@ -172,7 +170,7 @@ nit <- 1
   
   if (rec.sc=="med"){
     
-    SRs <- SRs
+    SRs <- SRs_MED
     unc.yrs <- ac(1993:2017)
     
   } else if (rec.sc=="low"){
