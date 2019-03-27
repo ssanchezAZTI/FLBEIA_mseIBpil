@@ -273,13 +273,13 @@ pilHCRs <- function(stocks, advice, advice.ctrl, year, season, stknm,...){
       
       for(i in 1:iter){
         
-        if(rule == 1){
+        if(rule == 1 & Ftg[i]==ref.pts['Flow',]){
           fwd.ctrl <- fwdControl(data.frame(year = c(assyrnumb+1), quantity = c('f','ssb'),rel.year=c(NA,assyrnumb)))
           fwd.ctrl@trgtArray <- array(NA, dim = c(2, 3, 1:iter), dimnames=list(rep(assyrnumb+1,2), c("min","val","max"),iter=1:iter))
           #Set f 
           fwd.ctrl@trgtArray[1,2,] <- Ftg[i]
           #Set target in SSB to increase 5% when B1+ between bloss and 0.8 blim
-          fwd.ctrl@trgtArray[2,1,] <- ifelse(fwd.ctrl@trgtArray[1,2,]==0.1,1.051, NA)
+          fwd.ctrl@trgtArray[2,1,] <- 1.051
           
         } else {
           
