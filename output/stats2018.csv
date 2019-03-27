@@ -1,0 +1,3 @@
+"assessment";"rule";"rec";"initNage";"obsErr";"Median_SSB";"Median_lastSSB";"Risk1";"Risk2";"Risk3";"years_SSB_under_Blim";"years_get_SSB_up_Blim";"closure";"closure_once";"years_closure";"average_catch";"average_sd_catch";"p5";"pscaled";"TAC_ge_TACpref"
+"none";"1";"low";"none";"none";246850.681616953;254699.763369039;0.949411764705882;1;1;48.42;24.985;0.00627450980392157;0.18;0.32;23745.8702916844;6133.66669445204;0.8256;0.6672;NA
+"none";"1";"med";"none";"none";503467.121168736;525506.268772263;0.147450980392157;1;1;7.52;4.40333333333333;0.0337254901960784;0.76;1.72;46928.3407821385;19364.5670556216;0.4648;0.6932;NA
