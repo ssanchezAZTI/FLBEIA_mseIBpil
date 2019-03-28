@@ -591,6 +591,7 @@ indices_ss3$DEPM@index.q[] <- 1.13371
 last_DEPM<-2017
 noDEPMyears <- an(proj.yrs)[(((an(proj.yrs)-last_DEPM)-3)/3)%%1!=0]
 indices_ss3$DEPM@index.q[,ac(noDEPMyears),]<-NA
+indices_ss3$DEPM@index.q[,ac(last_DEPM+1),]<-NA
 
 ###change to estimated index values instead of observed
 
