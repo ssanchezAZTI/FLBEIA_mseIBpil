@@ -315,6 +315,20 @@ SRs_MED   <- list(PIL=FLSRsim(name = "PIL", model = "segreg",
 
 SRs_MED[["PIL"]]@uncertainty[,ac(proj.yrs),] <- exp(rnorm( length(proj.yrs), 0, sqrt(var(log(SRs_MED[["PIL"]]@uncertainty[,ac(yrs.srmed),,,]),na.rm=T))))
 
+# Estimate REC for assessment year (ass.yr):
+
+model <- as.list(eval(call(SRs_MED$PIL@model))[[2]])[[3]]
+datam <- list(ssb=SRs_MED$PIL@ssb[,ac(ass.yr-SRs_MED$PIL@timelag[1,]),,SRs_MED$PIL@timelag[2,],])
+for(i in dimnames(SRs_MED$PIL@params)$param) datam[[i]] <- c(SRs_MED$PIL@params[i,ac(ass.yr),,])
+
+SRs_MED[["PIL"]]@uncertainty[,ac(ass.yr),] <- exp(rnorm( 1, 0, sqrt(var(log(SRs_MED[["PIL"]]@uncertainty[,ac(yrs.srmed),,,]),na.rm=T))))
+
+SRs_MED$PIL@rec[,ac(ass.yr),] <- eval( model, datam) * SRs_MED[["PIL"]]@uncertainty[,ac(ass.yr),]
+
+biols$PIL@n[1,ac(ass.yr),] <- SRs_MED$PIL@rec[,ac(ass.yr),] #! if proj.yr <- ass.yr+1, then this code line should be included in 
+#  02_pil_simulations.R using the SR scenario selected
+
+
 # - SRs for low productivity regime
 # - Hockey - stick with inflexion point at Blow
 
@@ -330,6 +344,20 @@ SRs_LOW <- list(PIL = FLSRsim(name = "PIL", model = "segreg",
 
 SRs_LOW[["PIL"]]@uncertainty[,ac(proj.yrs),] <- exp(rnorm(length(proj.yrs), 0, sqrt(var(log(SRs_LOW[["PIL"]]@uncertainty[,ac(yrs.srlow),,,]),na.rm=T))))
 
+# Estimate REC for assessment year (ass.yr):
+
+model <- as.list(eval(call(SRs_LOW$PIL@model))[[2]])[[3]]
+datam <- list(ssb=SRs_LOW$PIL@ssb[,ac(ass.yr-SRs_LOW$PIL@timelag[1,]),,SRs_LOW$PIL@timelag[2,],])
+for(i in dimnames(SRs_LOW$PIL@params)$param) datam[[i]] <- c(SRs_LOW$PIL@params[i,ac(ass.yr),,])
+
+SRs_LOW[["PIL"]]@uncertainty[,ac(ass.yr),] <- exp(rnorm( 1, 0, sqrt(var(log(SRs_LOW[["PIL"]]@uncertainty[,ac(yrs.srlow),,,]),na.rm=T))))
+
+SRs_LOW$PIL@rec[,ac(ass.yr),] <- eval( model, datam) * SRs_LOW[["PIL"]]@uncertainty[,ac(ass.yr),]
+
+biols$PIL@n[1,ac(ass.yr),] <- SRs_LOW$PIL@rec[,ac(ass.yr),] #! if proj.yr <- ass.yr+1, then this code line should be included in 
+#  02_pil_simulations.R using the SR scenario selected
+
+
 # - SRs for low productivity regime
 # - Hockey - stick with inflexion point at Blow
 
@@ -344,6 +372,20 @@ SRs_MIX <- list(PIL = FLSRsim(name = "PIL", model = "segreg",
 # uncertainty for the projection years
 
 SRs_MIX[["PIL"]]@uncertainty[,ac(proj.yrs),] <- exp(rnorm(length(proj.yrs), 0, sqrt(var(log(SRs_MIX[["PIL"]]@uncertainty[,ac(yrs.srmix),,,]),na.rm=T))))
+
+# Estimate REC for assessment year (ass.yr):
+
+model <- as.list(eval(call(SRs_MIX$PIL@model))[[2]])[[3]]
+datam <- list(ssb=SRs_MIX$PIL@ssb[,ac(ass.yr-SRs_MIX$PIL@timelag[1,]),,SRs_MIX$PIL@timelag[2,],])
+for(i in dimnames(SRs_MIX$PIL@params)$param) datam[[i]] <- c(SRs_MIX$PIL@params[i,ac(ass.yr),,])
+
+SRs_MIX[["PIL"]]@uncertainty[,ac(ass.yr),] <- exp(rnorm( 1, 0, sqrt(var(log(SRs_MIX[["PIL"]]@uncertainty[,ac(yrs.srmix),,,]),na.rm=T))))
+
+SRs_MIX$PIL@rec[,ac(ass.yr),] <- eval( model, datam) * SRs_MIX[["PIL"]]@uncertainty[,ac(ass.yr),]
+
+biols$PIL@n[1,ac(ass.yr),] <- SRs_MIX$PIL@rec[,ac(ass.yr),] #! if proj.yr <- ass.yr+1, then this code line should be included in 
+#  02_pil_simulations.R using the SR scenario selected
+
 
 
 # Biomass dynamics (for stocks in biomass) ----
