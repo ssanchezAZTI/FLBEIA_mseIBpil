@@ -248,8 +248,8 @@ pilsr@rec[,ac(ass.yr),] <- NA  # remove REC estimate for assessment year (110697
 model(pilsr) <- segreg()
 
 #params for sr medium regime
-yrs.srmed <- 1993:2015
-params_med <- fmle(window(pilsr, start=1993, end=2015), fixed=list(b=PIL_ref.pts[["Blim"]]))@params # for pilsr
+yrs.srmed <- 1993:2017
+params_med <- fmle(window(pilsr, start=1993, end=2017), fixed=list(b=PIL_ref.pts[["Blim"]]))@params # for pilsr
 
 pilsr <- fmle(pilsr, fixed=list(a=c(params_med)[1],b=PIL_ref.pts[["Blim"]]))
 
