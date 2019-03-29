@@ -92,7 +92,7 @@ nit <- 1
 # - INNfix: same initial numbers at age for all iterations
 # - INNvar: different initial numbers at age for all iterations
   
-  inn.sc <- "none" # "var"
+  inn.sc <- "fix" # "var"
   
 # OBSERVATION ERROR
 # - OERnone  : perfect observation
@@ -167,7 +167,7 @@ nit <- 1
     if(any(!c("Bloss","Blim","Floss","Fmsy") %in% rownames(advice.ctrl$PIL$ref.pts)))
       stop("Required reference points missing: Bloss, Blim, Floss, Fmsy")
     
-  } else if (rule.sc==1) {
+  } else if (rule.sc==2) {
     
     if(any(!c("Bloss","Blim","Flow","Fmsy") %in% rownames(advice.ctrl$PIL$ref.pts)))
       stop("Required reference points missing: Bloss, Blim, Flow, Fmsy")
@@ -215,12 +215,14 @@ nit <- 1
   # INITIAL NUMBERS AT AGE
   
   if (inn.sc == "var") {
+  
+    initpop.yrn <- ac(main.ctrl$sim.years["initial"])
     
     # Simulate from a lognormal distribution (mean=0, var=assessment variaces in log-numbers-at-age)
-    biols$PIL@n[,proj.yrs[1],] <- biols$PIL@n[-1,proj.yrs[1],] * 
+    biols$PIL@n[,initpop.yrn,] <- biols$PIL@n[,initpop.yrn,] * 
       rlnorm( length(ages), meanlog = 0, sdlog = c(0,0.29,0.19,0.20,0.22,0.21,0.26))
     
-  } else if (inn.sc != "none")
+  } else if (inn.sc != "fix")
     stop("Not valid value for inn.sc")
 
 
