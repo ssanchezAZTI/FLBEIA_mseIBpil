@@ -284,15 +284,15 @@ pilsr2 <- fmle(pilsr2, fixed=list(a=c(params_low)[1],b=Blow))
 # Mixture of both SRs
 pilsr3 <- FLSR(rec=pil@n[1,], ssb=ssb(pil))
 
-pilsr3@rec[,ac(ass.yr),] <- NA  # remove REC estimate for assessment year (11069700) 
+pilsr3@rec[,ac(ass.yr),] <- NA  # remove REC estimate for assessment year (11069700)
+
+pilsr3@covar <- FLQuants( uncAdd = FLQuant( 1, dimnames=dimnames(pilsr3@ssb)))
 
 model(pilsr3) <- segregmix()
 params_low
 params_med
 
-yrs.srmix <- 1993:2017
-
-pilsr3 <- fmle(pilsr3, fixed=list( a=c(params_low)[1], b=Blow, 
+pilsr3 <- fmle(pilsr3, fixed=list( a=c(params_low)[1], b=Blow,
                                    A=c(params_med)[1], B=PIL_ref.pts[["Blim"]]))
 
 
@@ -313,7 +313,8 @@ SRs_MED   <- list(PIL=FLSRsim(name = "PIL", model = "segreg",
 
 # uncertainty for the projection years
 
-SRs_MED[["PIL"]]@uncertainty[,ac(proj.yrs),] <- exp(rnorm( length(proj.yrs), 0, sqrt(var(log(SRs_MED[["PIL"]]@uncertainty[,ac(yrs.srmed),,,]),na.rm=T))))
+residsd_med <- sqrt(var(log(SRs_MED[["PIL"]]@uncertainty[,ac(yrs.srmed),,,]),na.rm=T))
+SRs_MED[["PIL"]]@uncertainty[,ac(proj.yrs),] <- exp(rnorm( length(proj.yrs), 0, residsd_med))
 
 # Estimate REC for assessment year (ass.yr):
 
@@ -321,12 +322,12 @@ model <- as.list(eval(call(SRs_MED$PIL@model))[[2]])[[3]]
 datam <- list(ssb=SRs_MED$PIL@ssb[,ac(ass.yr-SRs_MED$PIL@timelag[1,]),,SRs_MED$PIL@timelag[2,],])
 for(i in dimnames(SRs_MED$PIL@params)$param) datam[[i]] <- c(SRs_MED$PIL@params[i,ac(ass.yr),,])
 
-SRs_MED[["PIL"]]@uncertainty[,ac(ass.yr),] <- exp(rnorm( 1, 0, sqrt(var(log(SRs_MED[["PIL"]]@uncertainty[,ac(yrs.srmed),,,]),na.rm=T))))
+SRs_MED[["PIL"]]@uncertainty[,ac(ass.yr),] <- exp(rnorm( 1, 0, residsd_med))
 
 SRs_MED$PIL@rec[,ac(ass.yr),] <- eval( model, datam) * SRs_MED[["PIL"]]@uncertainty[,ac(ass.yr),]
 
 biols$PIL@n[1,ac(ass.yr),] <- SRs_MED$PIL@rec[,ac(ass.yr),] #! if proj.yr <- ass.yr+1, then this code line should be included in 
-#  02_pil_simulations.R using the SR scenario selected
+                                                            #  02_pil_simulations.R using the SR scenario selected
 
 
 # - SRs for low productivity regime
@@ -342,7 +343,8 @@ SRs_LOW <- list(PIL = FLSRsim(name = "PIL", model = "segreg",
 
 # uncertainty for the projection years
 
-SRs_LOW[["PIL"]]@uncertainty[,ac(proj.yrs),] <- exp(rnorm(length(proj.yrs), 0, sqrt(var(log(SRs_LOW[["PIL"]]@uncertainty[,ac(yrs.srlow),,,]),na.rm=T))))
+residsd_low <- sqrt(var(log(SRs_LOW[["PIL"]]@uncertainty[,ac(yrs.srlow),,,]),na.rm=T))
+SRs_LOW[["PIL"]]@uncertainty[,ac(proj.yrs),] <- exp(rnorm(length(proj.yrs), 0, residsd_low))
 
 # Estimate REC for assessment year (ass.yr):
 
@@ -350,41 +352,60 @@ model <- as.list(eval(call(SRs_LOW$PIL@model))[[2]])[[3]]
 datam <- list(ssb=SRs_LOW$PIL@ssb[,ac(ass.yr-SRs_LOW$PIL@timelag[1,]),,SRs_LOW$PIL@timelag[2,],])
 for(i in dimnames(SRs_LOW$PIL@params)$param) datam[[i]] <- c(SRs_LOW$PIL@params[i,ac(ass.yr),,])
 
-SRs_LOW[["PIL"]]@uncertainty[,ac(ass.yr),] <- exp(rnorm( 1, 0, sqrt(var(log(SRs_LOW[["PIL"]]@uncertainty[,ac(yrs.srlow),,,]),na.rm=T))))
+SRs_LOW[["PIL"]]@uncertainty[,ac(ass.yr),] <- exp(rnorm( 1, 0, residsd_low))
 
 SRs_LOW$PIL@rec[,ac(ass.yr),] <- eval( model, datam) * SRs_LOW[["PIL"]]@uncertainty[,ac(ass.yr),]
 
 biols$PIL@n[1,ac(ass.yr),] <- SRs_LOW$PIL@rec[,ac(ass.yr),] #! if proj.yr <- ass.yr+1, then this code line should be included in 
-#  02_pil_simulations.R using the SR scenario selected
+                                                            #  02_pil_simulations.R using the SR scenario selected
 
 
 # - SRs for low productivity regime
 # - Hockey - stick with inflexion point at Blow
 
-SRs_MIX <- list(PIL = FLSRsim(name = "PIL", model = "segreg",
-                              rec = rec(pilsr3), ssb = ssb(pilsr3),
-                              params = array( c(pilsr3@params),
-                                              dim = c(length(params(pilsr3)), dim(rec(pilsr3))[c(2,4,6)]),
-                                              dimnames = list(param = dimnames(params(pilsr3))$params, year = ac(first.yr:last.yr), season = 1, iter = ni)),
-                              uncertainty = exp(residuals(pilsr3)), proportion = FLQuant( 1, dimnames=dimnames(biols$PIL@n[1,])[-1]),
-                              covar = FLQuants(),range=range(pil)[1:5]))
+pars <- c("a", "b", "A", "B")
+dnms <- dimnames(ssb(pilsr))
+params_mix <- FLPar( c(params_low, params_med, 1), 
+                     dimnames = list( param=pars, year=dnms$year, season=dnms$season, iter=dnms$iter))
+covars_mix <- FLQuant( 1, dimnames=dimnames(ssb(pilsr)))
+
+SRs_MIX <- list(PIL = FLSRsim( name = "PIL", model = "segreg",
+                               rec = rec(pilsr), ssb = ssb(pilsr),
+                               params = params_mix,
+                               uncertainty = FLQuant( NA, dimnames=dnms),
+                               proportion = FLQuant( 1, dimnames=dnms),
+                               covar = FLQuants(uncAdd=covars_mix),range=range(biols$PIL)[1:5]))
+
+SRs_MIX$PIL@model <- "segregmix"
 
 # uncertainty for the projection years
 
-SRs_MIX[["PIL"]]@uncertainty[,ac(proj.yrs),] <- exp(rnorm(length(proj.yrs), 0, sqrt(var(log(SRs_MIX[["PIL"]]@uncertainty[,ac(yrs.srmix),,,]),na.rm=T))))
+SRs_MIX[["PIL"]]@uncertainty[,ac(proj.yrs),] <- exp(rnorm(length(proj.yrs), 0, residsd_low))
+
+# covar for the projection years
+
+SRs_MIX[["PIL"]]@covar$uncAdd[,ac(proj.yrs),] <- SRs_MIX[["PIL"]]@uncertainty[,ac(proj.yrs),] ^(residsd_med/residsd_low-1)
 
 # Estimate REC for assessment year (ass.yr):
 
 model <- as.list(eval(call(SRs_MIX$PIL@model))[[2]])[[3]]
-datam <- list(ssb=SRs_MIX$PIL@ssb[,ac(ass.yr-SRs_MIX$PIL@timelag[1,]),,SRs_MIX$PIL@timelag[2,],])
+datam <- list(ssb=SRs_MIX$PIL@ssb[,ac(ass.yr-SRs_MIX$PIL@timelag[1,]),,SRs_MIX$PIL@timelag[2,],],
+              uncAdd=SRs_MIX$PIL@covar$uncAdd[,ac(ass.yr),,,])
 for(i in dimnames(SRs_MIX$PIL@params)$param) datam[[i]] <- c(SRs_MIX$PIL@params[i,ac(ass.yr),,])
 
-SRs_MIX[["PIL"]]@uncertainty[,ac(ass.yr),] <- exp(rnorm( 1, 0, sqrt(var(log(SRs_MIX[["PIL"]]@uncertainty[,ac(yrs.srmix),,,]),na.rm=T))))
+# uncertainty for the assessment year
+
+SRs_MIX[["PIL"]]@uncertainty[,ac(ass.yr),] <- exp(rnorm(1, 0, residsd_low))
+
+# covar for the assessment year
+
+SRs_MIX[["PIL"]]@covar$uncAdd[,ac(ass.yr),] <- SRs_MIX[["PIL"]]@uncertainty[,ac(ass.yr),] ^(residsd_med/residsd_low-1)
+
 
 SRs_MIX$PIL@rec[,ac(ass.yr),] <- eval( model, datam) * SRs_MIX[["PIL"]]@uncertainty[,ac(ass.yr),]
 
 biols$PIL@n[1,ac(ass.yr),] <- SRs_MIX$PIL@rec[,ac(ass.yr),] #! if proj.yr <- ass.yr+1, then this code line should be included in 
-#  02_pil_simulations.R using the SR scenario selected
+                                                            #  02_pil_simulations.R using the SR scenario selected
 
 
 
@@ -772,7 +793,7 @@ main.ctrl$sim.years["initial"] <- 2018
 # SAVE FLBEIA INPUTS                                                       ----
 #==============================================================================
 
-save( biols, SRs_MED, SRs_LOW, SRs_MIX, yrs.srmed, yrs.srlow, yrs.srmix,
+save( biols, SRs_MED, SRs_LOW, SRs_MIX, residsd_med, residsd_low,
       fleets, covars, #indices,
       indices_none,indices_ss3, advice, 
       main.ctrl, biols.ctrl, fleets.ctrl, covars.ctrl, 

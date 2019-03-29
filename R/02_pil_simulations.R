@@ -82,11 +82,11 @@ nit <- 1
   rule.sc <- 1 #2
 
 # RECRUITMENT
-# - REClow   : low recruitment regime
-# - RECmed   : medium recruitment regime
-# - REClowmed: changing recruitment regime
+# - REClow: low recruitment regime
+# - RECmed: medium recruitment regime
+# - RECmix: changing recruitment regime
 
-  rec.sc <- "low" # "med", "lowmed"
+  rec.sc <- "mix" # "med", "low"
 
 # INITIAL NUMBERS AT AGE
 # - INNfix: same initial numbers at age for all iterations
@@ -104,7 +104,7 @@ nit <- 1
 # List of all the scenarios:
   
   # scenario_list <- c()
-  # for (ass in c("none","emul","ss3")) for (rule in c(1:2)) for (rec in c("low","med","lowmed"))
+  # for (ass in c("none","emul","ss3")) for (rule in c(1:2)) for (rec in c("low","med","mix"))
   #   for (inn in c("none","var")) for (oer in c("none","naq"))
   #     scenario_list <- c( scenario_list, paste("ASS",ass,"_HCR",rule,"_REC",rec,"_INN",inn,"_OER",oer,sep=""))
 
@@ -182,36 +182,33 @@ nit <- 1
   if (rec.sc=="med"){
     
     SRs <- SRs_MED
-    unc.yrs <- ac(1993:2017)
-    
+    # - uncertainties in SR
+    # Simulate from a lognormal distribution (mean=0, var=same as the estimated in SR model fitting)
+    SRs$PIL@uncertainty[,proj.yrs,,,] <-
+      exp(rnorm(length(proj.yrs), 0, residsd_med))
+
   } else if (rec.sc=="low"){
     
     SRs <- SRs_LOW
-    unc.yrs <- ac(2006:2017)
-    
     advice.ctrl$PIL$ref.pts["Blim",] <- Blow # different Blim
+    # Simulate from a lognormal distribution (mean=0, var=same as the estimated in SR model fitting)
+    SRs$PIL@uncertainty[,proj.yrs,,,] <-
+      exp(rnorm(length(proj.yrs), 0, residsd_low))
     
-  # } else if (rec.sc=="lowmed"){
-  #   
-  #   SRs <- SRs_LOWMED
-  #   unc.yrs <- ac(1993:2017)
+    
+  } else if (rec.sc=="mix"){
+
+    SRs <- SRs_MIX
+    # Simulate from a lognormal distribution (mean=0, var=same as the estimated in SR model fitting)
+    SRs$PIL@uncertainty[,proj.yrs,,,] <-
+      exp(rnorm(length(proj.yrs), 0, residsd_low))
+    SRs_MIX[["PIL"]]@covar$uncAdd[,ac(proj.yrs),] <- SRs_MIX[["PIL"]]@uncertainty[,ac(proj.yrs),] ^(residsd_med/residsd_low-1)
     
   } else
     
     stop("Check values in rec.sc")
   
-  # - uncertainties in SR
-  for (s in names(SRs)) {
-    
-    # Simulate from a lognormal distribution (mean=0, var=same as the estimated in SR model fitting)
-    SRs[[s]]@uncertainty[,proj.yrs,,,] <-
-      exp(rnorm(length(proj.yrs), 0, sqrt(var(log(SRs[[s]]@uncertainty[,unc.yrs,,,]),na.rm=T))))
-  
-  }
-  
-  #! HOW TO DO IT FOR LOWMED SCENARIO????
-  
-  
+
   # INITIAL NUMBERS AT AGE
   
   if (inn.sc == "var") {
@@ -280,6 +277,7 @@ if (ass.sc == "ss3") {
 #==============================================================================
 
 source("./R/fun/MP_HCR_IBpil.R")
+source("./R/fun/segregmix.R")
 
 # source("./R/fun/PILassess.R")
 # source("./R/fun/ss32flbeia.R")

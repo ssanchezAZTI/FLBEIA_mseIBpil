@@ -68,7 +68,7 @@ pilHCRs <- function(stocks, advice, advice.ctrl, year, season, stknm,...){
 
   if (rule %in% c(0:2)) {
     
-    stk <- window(stk, start=yrsnumbs[1], end=yrsnumbs[year]) #! CHECK WHEN ASSESSMENT USED
+    stk <- window(stk, start=yrsnumbs[1], end=yrsnumbs[year-1]) #! CHECK WHEN ASSESSMENT USED
     
     # Short Term Forecast (STF)
     
