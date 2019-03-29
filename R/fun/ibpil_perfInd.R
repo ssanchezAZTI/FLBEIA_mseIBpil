@@ -22,7 +22,7 @@
 
 perfInd.pil <- function( obj.bio="out.bio", obj.adv="out.adv", #obj.eco="out.flt", obj.adv="out.adv",
                          scenario, file.dat,
-                         proj.yrs=2018:2037, Blim=337448, TACpref=NA) {
+                         proj.yrs=2018:2037, Blim=337448, Blow=196334 ,TACpref=NA) {
   
   # biological data
   xx <- loadToEnv( file.dat)[[obj.bio]]
@@ -47,28 +47,69 @@ perfInd.pil <- function( obj.bio="out.bio", obj.adv="out.adv", #obj.eco="out.flt
   nit <- length(it)
   yrnms <- proj.yrs
   nyr <- length(yrnms)
+  first.yr <- proj.yrs[1]
+  last.yr <- proj.yrs[length(proj.yrs)]
+  
+  
+  # periods of interest
+  initf <- c(first.yr:(first.yr+5)) # short-term first 5 years
+  stf <- c((first.yr):(first.yr+10)) # short-term first 10 years
+  ltf <- c((last.yr-10):last.yr) # equilibrium last 10 years
+  allf <- c(first.yr:last.yr) # all forecast years
   
   # # initialise vector for output
   # out <- NULL
   
-  # Median SSB
-  out <- median(xx[,'ssb'])
+  # quantiles SSB
+  out <- c(quantile(xx[,'ssb'],c(0.05,0.5,0.95)))
+  
+  # Mean SSB
+  tmp <- mean(xx[,'ssb'])
+  out <- c(out,tmp)
   
   # Median last SSB
   tmp <- median(xx[xx$year==max(yrnms),'ssb'])
   out <- c(out, tmp)
   
-  # Risk 1: P(SSB < Blim)
-  pBlim <- ifelse( xx[,'ssb'] < Blim, 1, 0)
-  tmp <- sum(pBlim) / (nit * nyr)
+  # Interannual variation of B1+
+  out <- c(out, apply(matrix(unlist(tapply( xx[,'ssb'], list(xx$iter), tacdif) ), nrow=nit, byrow=T), 2, mean))
+  
+  # # Risk 1: P(SSB < Blim)
+   pBlim <- ifelse( xx[,'ssb'] < Blim, 1, 0)
+  # tmp <- sum(pBlim) / (nit * nyr)
+  # out <- c(out, tmp)
+  # 
+  # # Risk 2: P(SSB < Blim) at least once
+  # tmp <- mean( tapply(pBlim, list(xx$iter), max) ) 
+  # out <- c(out, tmp)
+  
+  # Risk MP: P(SSB < 0.8*Blim) in 5 years
+  p08Blim <- ifelse( xx[xx$year %in% initf,'ssb'] < 0.8*Blim, 1, 0)
+  tmp <-  sum(p08Blim) / (nit * length(initf))
   out <- c(out, tmp)
   
-  # Risk 2: P(SSB < Blim) at least once
-  tmp <- mean( tapply(pBlim, list(xx$iter), max) ) 
+  # Risk recovery: P(SSB < Blim) in 5 years
+  pBlim2 <- ifelse( xx[xx$year %in% initf,'ssb'] < Blim, 1, 0)
+  tmp <-  sum(pBlim2) / (nit * length(initf))
   out <- c(out, tmp)
   
   # Risk 3: maximum anual P(SSB < Blim)
   tmp <- max( tapply(pBlim, list(xx$year), mean) ) 
+  out <- c(out, tmp)
+  
+  # Risk MP_Low: P(SSB < 0.8*Blow) in 5 years
+  p08Blow <- ifelse( xx[xx$year %in% initf,'ssb'] < 0.8*Blow, 1, 0)
+  tmp <-  sum(p08Blow) / (nit * length(initf))
+  out <- c(out, tmp)
+  
+  # Risk recovery_Low: P(SSB < Blow) in 5 years
+  pBlow2 <- ifelse( xx[xx$year %in% initf,'ssb'] < Blow, 1, 0)
+  tmp <-  sum(pBlow2) / (nit * length(initf))
+  out <- c(out, tmp)
+  
+  # Risk 3_Low: maximum anual P(SSB < Blow)
+  pBlow <- ifelse( xx[,'ssb'] < Blow, 1, 0)
+  tmp <- max( tapply(pBlow, list(xx$year), mean) ) 
   out <- c(out, tmp)
   
   # Average number of years that SSB < Blim
@@ -77,6 +118,14 @@ perfInd.pil <- function( obj.bio="out.bio", obj.adv="out.adv", #obj.eco="out.flt
   
   # Average/median number of years necessary to get SSB > Blim
   tmp <- tapply( pBlim, list(xx$iter), auxiliary.f)
+  out <- c(out, mean(tmp))
+  
+  # Average number of years that SSB < Blow
+  tmp <- mean (tapply(pBlow, list(xx$iter), sum) )
+  out <- c(out, tmp)
+  
+  # Average/median number of years necessary to get SSB > Blow
+  tmp <- tapply( pBlow, list(xx$iter), auxiliary.f)
   out <- c(out, mean(tmp))
   
   # Probability that the fishery is closed
@@ -92,6 +141,10 @@ perfInd.pil <- function( obj.bio="out.bio", obj.adv="out.adv", #obj.eco="out.flt
   tmp <- mean (tapply(pclosed, list(xx$iter), sum) )
   out <- c(out, tmp)
   
+  # quantiles catch
+  tmp <- quantile(xx[,'catch'],c(0.05,0.5,0.95))
+  out <- c(out,tmp)
+  
   # Average catch
   out <- c(out, mean(xx[,'catch']))
   
@@ -99,24 +152,29 @@ perfInd.pil <- function( obj.bio="out.bio", obj.adv="out.adv", #obj.eco="out.flt
   out <- c(out, mean(tapply( xx[,'catch'], list(xx$iter), sd ) ))
   
   # Interanual variation
-  out <- c(out, apply(matrix(unlist(tapply( xx[,'catch'], list(xx$iter), tacdif) ), nrow=nit, byrow=T), 2, mean))
+  out <- c(out, apply(matrix(unlist(tapply( xx[,'catch'], list(xx$iter), tacdif) ), nrow=nit, byrow=T), 2, mean)[1:3])
   
-  # P(TAC >= TACpref)
-  if (is.na(TACpref)) TACpref <- 0
-  if (TACpref>0) {
-    pTACpref <- ifelse(xx[,'catch'] >= TACpref, 1, 0)
-    tmp <- sum(pTACpref) / (nit * nyr)
-  } else tmp <- NA
-  out <- c(out, tmp)
+  # # P(TAC >= TACpref)
+  # if (is.na(TACpref)) TACpref <- 0
+  # if (TACpref>0) {
+  #   pTACpref <- ifelse(xx[,'catch'] >= TACpref, 1, 0)
+  #   tmp <- sum(pTACpref) / (nit * nyr)
+  # } else tmp <- NA
+  # out <- c(out, tmp)
   
   out <- as.data.frame(matrix(out, nrow=1))
   
-  names(out) <- c( "Median_SSB", "Median_lastSSB",
-                   "Risk1", "Risk2", "Risk3", 
-                   "years_SSB_under_Blim", "years_get_SSB_up_Blim", 
+  names(out) <- c( "p05_SSB","Median_SSB","p95_SSB","Mean_SSB", "Median_lastSSB",
+                   "p5_SSB","pscaled_SSB","percDif_SSB","above5%Allyears_SSB",
+                   #"Risk1", "Risk2", 
+                   "MP_Risk","Recovery_Risk","Risk3", 
+                   "MP_Risk_Low","Recovery_Risk_Low","Risk3_Low",
+                   "years_SSB_under_Blim", "years_get_SSB_up_Blim",
+                   "years_SSB_under_Blow", "years_get_SSB_up_Blow",
                    "closure", "closure_once", "years_closure",
+                   "p05_catch","Median_catch","p95_catch",
                    "average_catch", "average_sd_catch",
-                   "p5","pscaled","TAC_ge_TACpref")
+                   "p5_catch","pscaled_catch","percDif_catch")
   
   out <- cbind(scenario=scenario, out)
   
@@ -154,15 +212,18 @@ auxiliary.f <- function(x){
 
 tacdif <- function(dd){ # function to compute statistics for tac difference for 1 vector
   ny <- length(dd)
-  dif <- dd[2:ny]-dd[1:(ny-1)]  
+  dif <- dd[2:ny]-dd[1:(ny-1)]
+  pdif <- dd[2:ny]/dd[1:(ny-1)]
   meandif <- mean(dif)
+  meanpdif <- mean(pdif)
+  intpdif <- sum(ifelse(pdif>1.05,1,0)) # sum of years that %dif is above 5%
   rangedif <- max(dif)-min(dif)
   brks1 <- c(-Inf,-5000,5000,Inf)
   pdif1 <- table(cut(dif, brks1))[2]/length(dif)
   brks2 <- c(-Inf, meandif-0.15*rangedif, meandif+0.15*rangedif, Inf)
   pdif2 <- ifelse(rangedif<1e-6, 1, table(cut(dif, brks2))[2]/length(dif))  
-  out <- c(pdif1, pdif2)
-  names(out)<- c("p5","pscaled")
+  out <- c(pdif1, pdif2,meanpdif,intpdif)
+  names(out)<- c("p5","pscaled","percDif","p5Allyears")
   return(out)
 }  
 
