@@ -89,10 +89,8 @@ advQ <- subset(advQ, select=c("stock","indicator","year","scenario","q95","q50",
 
 # load the reference points
 
-stknms <- "PIL"
-
 load(file.path("input", "PIL_refpts2018.RData"))
-RefPts <- expand.grid(indicator=c("Bmsy", "Fmsy", "Bpa", "Blim", "Fpa", "Flim"), scenario=scenario_list, stock=stknms, value=NA)[,c(3,2,1,4)]
+RefPts <- expand.grid(indicator=c("Bmsy", "Fmsy", "Bpa", "Blim", "Fpa", "Flim"), scenario=scenario_list, stock=c("PIL"), value=NA)[,c(3,2,1,4)]
 RefPts$value <- rep(PIL_ref.pts[c("Bmsy", "Fmsy", "Bpa", "Blim", "Fpa", "Flim")], length(scenario_list))
 
 # launch FLBEIA
