@@ -1,13 +1,13 @@
 ################################################################################
-#  IBpil results - plots in shiny                                             # 
+#  IBpil results - plots in shiny                                              # 
 #------------------------------------------------------------------------------#
 #   Sonia Sanchez (AZTI-Tecnalia)                                              #
 #   created:  29/03/2019                                                       #
-#   modified:                                                                   #
+#   modified:                                                                  #
 ################################################################################
 
 # Copyright: AZTI, 2019
-# Author: Sonia Sanchez (AZTI) (<ssanchez@azti.es>)
+# Author: Leire Ibaibarriaga (AZTI) (<libaibarriaga@azti.es>)
 #
 # Distributed under the terms of the GNU GPLv3
 
@@ -88,6 +88,8 @@ advQ$stock <- "PIL"
 advQ <- subset(advQ, select=c("stock","indicator","year","scenario","q95","q50","q05"))
 
 # load the reference points
+
+stknms <- "PIL"
 
 load(file.path("input", "PIL_refpts2018.RData"))
 RefPts <- expand.grid(indicator=c("Bmsy", "Fmsy", "Bpa", "Blim", "Fpa", "Flim"), scenario=scenario_list, stock=stknms, value=NA)[,c(3,2,1,4)]
