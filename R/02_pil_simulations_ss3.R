@@ -223,11 +223,11 @@ nit <- 1
   
   if (inn.sc == "var") {
   
-    initpop.yrn <- ac(main.ctrl$sim.years["initial"])
+    initpop.yrn <- ac(main.ctrl$sim.years["initial"]-1)
     
     # Simulate from a lognormal distribution (mean=0, var=assessment variaces in log-numbers-at-age)
     biols$PIL@n[,initpop.yrn,] <- biols$PIL@n[,initpop.yrn,] * 
-      rlnorm( length(ages), meanlog = 0, sdlog = c(0,0.29,0.19,0.20,0.22,0.21,0.26))
+      rlnorm( length(ages), meanlog = 0, sdlog = c(0.29,0.19,0.20,0.22,0.21,0.26,0.26))
     
   } else if (inn.sc != "fix")
     stop("Not valid value for inn.sc")
