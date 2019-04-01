@@ -1,9 +1,0 @@
-#!/bin/bash
-#$ -cwd
-#$ -o qsub_out/job-$JOB_ID_task-$TASK_ID.stdout
-#$ -e qsub_out/job-$JOB_ID_task-$TASK_ID.stderr
-#$ -S /bin/bash
-. /etc/profile
-# module add R
-echo Starting job $JOB_ID - task $SGE_TASK_ID
-R CMD BATCH --no-save R/02_pil_simulations.r qsub_out/R-${JOB_ID}-${SGE_TASK_ID}.Rout
