@@ -63,7 +63,7 @@ source("./R/fun/segregmix.R")
 
 first.yr <- 1978  # First year of the historic data.
 proj.yr  <- 2019  # first year of projection
-proj.nyr <- 50    # Number of years in the projection period
+proj.nyr <- 30    # Number of years in the projection period
 
 #---- periods ----
 

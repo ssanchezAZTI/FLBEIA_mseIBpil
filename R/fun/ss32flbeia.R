@@ -15,7 +15,7 @@ ss32flbeia<-function(stock,indices,control,covars=covars){
   
   #last year of the new stock object
   lasty<-range(stock)["maxyear"]
-  stock@catch <- catch(stock)
+  stock@catch <- computeCatch(stock)
 
   ## if catch < 10^-6 , give small value to total catch, remove catch at age (done some lines later)
   ## and put the wt from year before. Not to have problems in SS3
