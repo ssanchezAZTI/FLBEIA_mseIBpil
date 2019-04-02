@@ -225,9 +225,10 @@ nit <- 1
   
     initpop.yrn <- ac(main.ctrl$sim.years["initial"]-1)
     
-    # Simulate from a lognormal distribution (mean=0, var=assessment variaces in log-numbers-at-age)
+    # Simulate from a lognormal distribution (mean=0, CV=assessment CV in 2018 log-numbers-at-age)
+    cv_logN <- c(0.29,0.19,0.20,0.22,0.21,0.26,0.26)
     biols$PIL@n[,initpop.yrn,] <- biols$PIL@n[,initpop.yrn,] * 
-      rlnorm( length(ages), meanlog = 0, sdlog = c(0.29,0.19,0.20,0.22,0.21,0.26,0.26))
+      rlnorm( length(ages), meanlog = 0, sdlog = sqrt(log(cv_logN^2+1)))
     
   } else if (inn.sc != "fix")
     stop("Not valid value for inn.sc")
@@ -237,10 +238,17 @@ nit <- 1
 if (oer.sc=="naq") {
   
   # obsevation errors in numbers at age
+  #! A SER POSIBLE CALCULAR LOS ERRORES EN EL FICHERO 01 Y GUARDARLOS EN EL FICHERO DE INPUTS PARA ESTE CODIGO
+  #! ASI TENDREMOS TRAZABILIDAD DE LOS DATOS
+  
+  
+  
   # obsevation errors in survey catchabilities
   
+  #! LO MISMO QUE ANTES PARA LA TRAZABILIDAD: intentar calcularlo dentro del 01 si es posible
+  
   # Simulate from a lognormal distribution
-  ##AcouticN
+    ##AcouticN
   # > apply(log(AcousticN/natage),2,mean)
   # a0          a1          a2          a3          a4          a5          a6 
   # -Inf  0.03363665 -0.06660685 -0.03524329  0.18057145  0.35486293 -0.16620986 
@@ -249,7 +257,9 @@ if (oer.sc=="naq") {
   # NaN 0.4836377 0.5184707 0.4399987 0.5134851 0.6282970 0.7162383 
   
   AcousticN.errors<-indices$PIL$AcousticNumberAtAge@index.q
-  AcousticN.errors[,]<-rlnorm(length(ages)*dim(AcousticN.errors)[2], meanlog = (c(0,0.03363665, -0.06660685, -0.03524329,  0.18057145,  0.35486293, -0.16620986 )), sdlog = c(0,0.4836377, 0.5184707, 0.4399987, 0.5134851, 0.6282970, 0.7162383))
+  AcousticN.errors[,]<-rlnorm(length(ages)*dim(AcousticN.errors)[2], 
+                              meanlog = (c(0,0.03363665, -0.06660685, -0.03524329,  0.18057145,  0.35486293, -0.16620986 )), 
+                              sdlog = c(0,0.4836377, 0.5184707, 0.4399987, 0.5134851, 0.6282970, 0.7162383))
   indices$PIL$AcousticNumberAtAge@index.q[,] <- AcousticN.errors[,]
   indices$PIL$AcousticNumberAtAge@index.q[1,]<-0
   

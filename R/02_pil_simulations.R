@@ -215,10 +215,10 @@ nit <- 1
   
     initpop.yrn <- ac(main.ctrl$sim.years["initial"]-1)
     
-    # Simulate from a lognormal distribution (mean=0, var=assessment variaces in log-numbers-at-age)
-    # as proj.yr = ass.yr --> take sd of age a in year y as sd of age a-1 in year y-1
+    # Simulate from a lognormal distribution (mean=0, CV=assessment CV in 2018 log-numbers-at-age)
+    cv_logN <- c(0.29,0.19,0.20,0.22,0.21,0.26,0.26)
     biols$PIL@n[,initpop.yrn,] <- biols$PIL@n[,initpop.yrn,] * 
-      rlnorm( length(ages), meanlog = 0, sdlog = c(0.29,0.19,0.20,0.22,0.21,0.26,0.26))
+      rlnorm( length(ages), meanlog = 0, sdlog = sqrt(log(cv_logN^2+1)))
     
   } else if (inn.sc != "fix")
     stop("Not valid value for inn.sc")
