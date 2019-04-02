@@ -202,7 +202,7 @@ nit <- 1
     # Simulate from a lognormal distribution (mean=0, var=same as the estimated in SR model fitting)
     SRs$PIL@uncertainty[,proj.yrs,,,] <-
       exp(rnorm(length(proj.yrs), 0, residsd_low))
-    SRs_MIX[["PIL"]]@covar$uncAdd[,ac(proj.yrs),] <- SRs_MIX[["PIL"]]@uncertainty[,ac(proj.yrs),] ^(residsd_med/residsd_low-1)
+    SRs[["PIL"]]@covar$uncAdd[,ac(proj.yrs),] <- SRs[["PIL"]]@uncertainty[,ac(proj.yrs),] ^(residsd_med/residsd_low-1)
     
   } else
     
