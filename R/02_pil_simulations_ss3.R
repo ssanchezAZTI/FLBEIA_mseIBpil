@@ -245,10 +245,18 @@ if (oer.sc=="naq") {
   
   # obsevation errors in survey catchabilities
   
-  #! LO MISMO QUE ANTES PARA LA TRAZABILIDAD: intentar calcularlo dentro del 01 si es posible
+  #! LO MISMO QUE ANTES PARA LA TRAZABILIDAD: intentar calcularlo dentro del 01 si es posible (hecho)
   
+  #CATCH NUMBERS obs errors
+  obs.ctrl$PIL$stkObs$land.nage.error[,]<-
+    rlnorm(prod(dim(obs.ctrl_SS3$PIL$stkObs$land.nage.error)[1:2]), 
+           meanlog = catch_resid_logmeans, 
+           sdlog = catch_resid_logsds)
+  
+  
+  #SURVEYS obs errors
   # Simulate from a lognormal distribution
-    ##AcouticN
+    ##AcouSticN
   # > apply(log(AcousticN/natage),2,mean)
   # a0          a1          a2          a3          a4          a5          a6 
   # -Inf  0.03363665 -0.06660685 -0.03524329  0.18057145  0.35486293 -0.16620986 

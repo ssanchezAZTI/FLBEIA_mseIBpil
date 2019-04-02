@@ -52,6 +52,7 @@ library(FLBEIA)
 #library(plyr)
 #library(R.utils)
 #library(ggplot2)
+library(r4ss)
 
 source("./R/fun/segregmix.R")
 
@@ -643,8 +644,28 @@ obs.ctrl_perf <- create.obs.ctrl(stksnames = stks,  stkObs.models = stkObs.model
 
 
 # # - Observation (--> errors in biological + fleet information + indices):
-obs.ctrl_SS3 <- create.obs.ctrl(stksnames = stks,flq.PIL=flq.PIL)
 
+##Errors for catch numbers from ss3 residuals###############################
+assess0 <- SS_output(dir = paste(wd_dat,"assess_ref",sep=""), model = "ss3", forecast=F,printstats=F,verbose=F)
+datss<-SS_readdat(paste(wd_dat,"assess_ref/sardine.dat",sep=""),verbose=F)
+
+estim_catchN<-subset(assess0$catage,Fleet==1&Yr>=2006&Yr<2018)[,ac(0:6)]
+dat_catchN<-subset(datss$agecomp,FltSvy==1&Yr>=2006)[,paste0("a",0:6)]
+
+catch_resid_logmeans<-apply(log(dat_catchN/estim_catchN),2,mean)
+catch_resid_logsds<-apply(log(dat_catchN/estim_catchN),2,sd)
+############################################################################
+
+obs.ctrl_SS3 <- create.obs.ctrl(stksnames = stks,flq.PIL=flq.PIL,stkObs.models = "age2ageDat")
+
+##landings multiplicative errors
+obs.ctrl_SS3$PIL$stkObs$land.nage.error[,]<-
+rlnorm(prod(dim(obs.ctrl_SS3$PIL$stkObs$land.nage.error)[1:2]), 
+       meanlog = catch_resid_logmeans, 
+       sdlog = catch_resid_logsds)
+
+
+##indices
 obs.ctrl_SS3$PIL$indObs <- list(AcousticNumberAtAge = list(indObs.model = "ageInd"),
                                 DEPM = list(indObs.model = "bioInd"))
 obs.ctrl_SS3$PIL$obs.curryr <- TRUE
@@ -794,7 +815,7 @@ main.ctrl$sim.years["initial"] <- 2018
 # SAVE FLBEIA INPUTS                                                       ----
 #==============================================================================
 
-save( biols, SRs_MED, SRs_LOW, SRs_MIX, residsd_med, residsd_low,
+save( biols, SRs_MED, SRs_LOW, SRs_MIX, residsd_med, residsd_low,catch_resid_logmeans,catch_resid_logsds,
       fleets, covars, #indices,
       indices_none,indices_ss3, advice, 
       main.ctrl, biols.ctrl, fleets.ctrl, covars.ctrl, 
