@@ -154,7 +154,7 @@ nit <- 1
     
     indices <- list(PIL = indices_ss3)
     
-    assess.ctrl[["PIL"]]$control$run_it<-it
+    assess.ctrl[["PIL"]]$control$run_it<-paste0(it,scenario)
     assess.ctrl[["PIL"]]$control$ref_name <- "assess_ref"
     assess.ctrl[["PIL"]]$control$assess_dir <- "/home/lcitores/FLBEIA_mseIBpil/ss3R/"
     k<-1000
