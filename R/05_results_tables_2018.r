@@ -88,7 +88,7 @@ rec        <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[3], 
 initNage   <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[4], 4, nchar(x[4]))))
 obsErr     <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[5], 4, nchar(x[4]))))
 
-out <- cbind( assessment, rule, rec, initNage, obsErr, out.byr[,-1])
+out <- cbind( assessment, rule, rec, initNage, obsErr, out.byr)
 
 out <- subset(out, year>=proj.yr)
 
