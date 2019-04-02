@@ -81,14 +81,17 @@ out.byr <- merge(dat.bio.q, dat.eco.q, by=c("scenario","year"))
 out.byr <- merge(out.byr, dat.adv.q, by=c("scenario","year"))
 
 # Separate scenario into different columns
-scenario   <- as.character(out.byr$scenario)
-assessment <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[1], 4, nchar(x[1]))))
-rule       <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[2], 4, nchar(x[2]))))
-rec        <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[3], 4, nchar(x[3]))))
-initNage   <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[4], 4, nchar(x[4]))))
-obsErr     <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[5], 4, nchar(x[4]))))
+# LEIRE: these columns are already included
 
-out <- cbind( assessment, rule, rec, initNage, obsErr, out.byr)
+# scenario   <- as.character(out.byr$scenario)
+# assessment <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[1], 4, nchar(x[1]))))
+# rule       <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[2], 4, nchar(x[2]))))
+# rec        <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[3], 4, nchar(x[3]))))
+# initNage   <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[4], 4, nchar(x[4]))))
+# obsErr     <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[5], 4, nchar(x[4]))))
+
+#out <- cbind( assessment, rule, rec, initNage, obsErr, out.byr)
+out <- out.byr
 
 out <- subset(out, year>=proj.yr)
 
