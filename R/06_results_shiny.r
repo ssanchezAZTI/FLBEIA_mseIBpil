@@ -25,7 +25,8 @@ wd <- "C:/use/GitHub/FLBEIA_mseIBpil/" # main directory
 setwd(wd)
 
 # directory with results
-res.dir  <- file.path("./output")
+#res.dir  <- file.path("./output")
+res.dir  <- file.path("./output_med_innvar_indiceserror_1000it")
 # directory with plots
 plot.dir <- file.path("./plots")
 
@@ -43,7 +44,7 @@ library(FLBEIAShiny)
 
 # names of the scenarios
 
-load(file.path("output", "scenario_list.RData"))
+load(file.path(res.dir, "scenario_list.RData"))
 length(scenario_list)
 
 #==============================================================================
@@ -52,9 +53,9 @@ length(scenario_list)
 
 # load Qsummaries for all the scenarios
 
-load(file.path("output","res_bio_all2018.RData"))
-load(file.path("output","res_eco_all2018.RData"))
-load(file.path("output","res_adv_all2018.RData"))
+load(file.path(res.dir,"res_bio_all2018.RData"))
+load(file.path(res.dir,"res_eco_all2018.RData"))
+load(file.path(res.dir,"res_adv_all2018.RData"))
 
 # reshape dat.bio.q to the long format
 # It would have been easier to compute the summary in wide, reshape to long and then compute que summaryQ
