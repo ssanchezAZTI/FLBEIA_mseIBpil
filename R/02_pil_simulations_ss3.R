@@ -87,19 +87,19 @@ nit <- 1
 # - RECmed: medium recruitment regime
 # - RECmix: changing recruitment regime
 
-  rec.sc <- "mix" # "med", "low"
+  rec.sc <- "mix" #"mix" # "med", "low"
 
 # INITIAL NUMBERS AT AGE
 # - INNfix: same initial numbers at age for all iterations
 # - INNvar: different initial numbers at age for all iterations
   
-  inn.sc <- "fix" # "var"
+  inn.sc <- "var" # "fix"
   
 # OBSERVATION ERROR
 # - OERnone  : perfect observation
 # - OERnaq   : observation error in numbers at age and survey catchabilities
   
-  oer.sc <- "none" # "naq"
+  oer.sc <- "naq" # "naq" none
 
   
 # List of all the scenarios:
@@ -156,7 +156,7 @@ nit <- 1
     
     assess.ctrl[["PIL"]]$control$run_it<-it
     assess.ctrl[["PIL"]]$control$ref_name <- "assess_ref"
-    assess.ctrl[["PIL"]]$control$assess_dir <- "C:/use/GitHub/FLBEIA_mseIBpil/ss3R/"
+    assess.ctrl[["PIL"]]$control$assess_dir <- "/home/lcitores/FLBEIA_mseIBpil/ss3R/"
     k<-1000
     
     
@@ -212,8 +212,8 @@ nit <- 1
     # Simulate from a lognormal distribution (mean=0, var=same as the estimated in SR model fitting)
     SRs$PIL@uncertainty[,proj.yrs,,,] <-
       exp(rnorm(length(proj.yrs), 0, residsd_low))
-    SRs_MIX[["PIL"]]@covar$uncAdd[,ac(proj.yrs),] <- SRs_MIX[["PIL"]]@uncertainty[,ac(proj.yrs),] ^(residsd_med/residsd_low-1)
-    
+      SRs[["PIL"]]@covar$uncAdd[,ac(proj.yrs),] <- SRs[["PIL"]]@uncertainty[,ac(proj.yrs),] ^(residsd_med/residsd_low-1) 
+
   } else
     
     stop("Check values in rec.sc")
@@ -238,6 +238,28 @@ if (oer.sc=="naq") {
   
   # obsevation errors in numbers at age
   # obsevation errors in survey catchabilities
+  
+  # Simulate from a lognormal distribution
+  ##AcouticN
+  # > apply(log(AcousticN/natage),2,mean)
+  # a0          a1          a2          a3          a4          a5          a6 
+  # -Inf  0.03363665 -0.06660685 -0.03524329  0.18057145  0.35486293 -0.16620986 
+  # > apply(log(AcousticN/natage),2,sd)
+  # a0        a1        a2        a3        a4        a5        a6 
+  # NaN 0.4836377 0.5184707 0.4399987 0.5134851 0.6282970 0.7162383 
+  
+  AcousticN.errors<-indices$PIL$AcousticNumberAtAge@index.q
+  AcousticN.errors[,]<-rlnorm(length(ages)*dim(AcousticN.errors)[2], meanlog = (c(0,0.03363665, -0.06660685, -0.03524329,  0.18057145,  0.35486293, -0.16620986 )), sdlog = c(0,0.4836377, 0.5184707, 0.4399987, 0.5134851, 0.6282970, 0.7162383))
+  indices$PIL$AcousticNumberAtAge@index.q[,] <- AcousticN.errors[,]
+  indices$PIL$AcousticNumberAtAge@index.q[1,]<-0
+  
+  ##DEPM cv=0.25 -> sd= sqrt(log(cv^2+1)) =
+  sd_DEPM<-sqrt(log(0.25^2+1))
+  DEPM.errors<-indices$PIL$DEPM@index.q
+  DEPM.errors[,]<-rlnorm(dim(DEPM.errors)[2], meanlog = 0, sdlog = sd_DEPM)
+  indices$PIL$DEPM@index.q[,] <- indices$PIL$DEPM@index.q[,]  * DEPM.errors[,]
+  
+  
   # obsevation errors in catches at age or any other???
   
 } else if (oer.sc != "none")
@@ -299,6 +321,7 @@ source("./R/fun/segregmix.R")
     covars$qs<-FLQuant(NA, dimnames=list(qs=c("acoustic","depm"), year=yrs))
     covars$sel<-FLQuant(NA, dimnames=list(age=0:6, year=yrs,unit=1:3))
     covars$conv<-FLQuant(NA, dimnames=list(conv="conv",year=yrs))
+    
 
 proj.obj <- FLBEIA( biols = biols, SRs = SRs, fleets = fleets, covars = covars, indices = indices, advice = advice, 
                     main.ctrl = main.ctrl, biols.ctrl = biols.ctrl,  fleets.ctrl = fleets.ctrl, 
