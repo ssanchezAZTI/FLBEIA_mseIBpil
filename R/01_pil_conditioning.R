@@ -218,6 +218,7 @@ Fpa  <- 0.190
 Flim <- 0.250 
 Bpa  <- 446331 
 Blim <- 337448 
+Blow <- 196334
 Bloss <- 112943
 Fmsy <- 0.120
 Floss <- 0.10 #for rule 1 when B1+ above Bloss
@@ -262,7 +263,7 @@ pilsr <- fmle(pilsr, fixed=list(a=c(params_med)[1],b=PIL_ref.pts[["Blim"]]))
 # dev.off()
 
 # Segmented regression (inflexion point at Blow for low productivity scenario)
-Blow <- 196334 #change point of Hockey stick for the low productivity 
+Blow #change point of Hockey stick for the low productivity 
 
 pilsr2 <- FLSR(rec=pil@n[1,], ssb=ssb(pil))
 
@@ -718,7 +719,7 @@ PIL_advice.TAC.flq[,ac(c(1990,1992,1994:1998)),] <- NA # no ICES advice
 PIL_advice.TAC.flq[,ac(c(1987:1989,1991,1993,1999:2017)),] <- c(140000,150000,212000,176000,135000,38000,81000,
                                                                 88000,95000,100000,128000,106000,96000,114000,
                                                                 92000,71000,75000,75000,36000,55000,17000,16000,12000,23000)  # ICES #advice
-PIL_advice.TAC.flq[,ac(2018),] <- c(14600)
+PIL_advice.TAC.flq[,ac(2018),] <- c(14060) # New catch estimate for 2018 (still not official)
 
 PIL_advice.quota.share.flq <- FLQuant( 1, dimnames=list(quant=stks,year=first.yr:last.yr), iter=ni)
 PIL_advice.avg.yrs         <- c(2013:2017)
