@@ -361,7 +361,7 @@ biols$PIL@n[1,ac(ass.yr),] <- SRs_LOW$PIL@rec[,ac(ass.yr),] #! if proj.yr <- ass
 # - SRs for low productivity regime
 # - Hockey - stick with inflexion point at Blow
 
-pars <- c("a", "b", "A", "B")
+pars <- c("a", "b", "A", "B", "uncAdd")
 dnms <- dimnames(ssb(pilsr))
 params_mix <- FLPar( c(params_low, params_med, 1), 
                      dimnames = list( param=pars, year=dnms$year, season=dnms$season, iter=dnms$iter))
