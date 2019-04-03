@@ -190,7 +190,7 @@ nit <- 1
   } else if (rec.sc=="low"){
     
     SRs <- SRs_LOW
-    advice.ctrl$PIL$ref.pts["Blim",] <- Blow # different Blim
+    
     # Simulate from a lognormal distribution (mean=0, var=same as the estimated in SR model fitting)
     SRs$PIL@uncertainty[,proj.yrs,,,] <-
       exp(rnorm(length(proj.yrs), 0, residsd_low))
