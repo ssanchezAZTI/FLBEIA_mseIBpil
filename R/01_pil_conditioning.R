@@ -190,22 +190,18 @@ round(PILstwa.mean,3)[drop=T]
 
 wt(biols$PIL)[,ac(proj.yrs),] <- PILstwa.mean
 
-# - Maturity at age: no patterns --> mean 1993-2017 (i.e. over the whole time series)
-myrs <- ac(hist.yrs)
-# statistics
-PILmat.mean <- yearMeans(mat(biols$PIL)[,myrs,])
-round(PILmat.mean,5)[drop=T]
+# - Maturity at age:
 #knife-edge ogive
 # 0 1 2 3 4 5 6 
 # 0 1 1 1 1 1 1
-
-mat(biols$PIL)[,ac(proj.yrs),] <- PILmat.mean
+mat(biols$PIL)[,ac(proj.yrs),] <- c(0,rep(1,6))
 
 # - Fecundity
 fec(biols$PIL)[,ac(proj.yrs),] <- c(rep(1,7))
 
 # - Spawning
 spwn(biols$PIL)[,ac(proj.yrs),] <- c(rep(0,7))
+
 
 #============================================================================
 # Reference points
