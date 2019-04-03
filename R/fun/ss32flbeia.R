@@ -15,12 +15,13 @@ ss32flbeia<-function(stock,indices,control,covars=covars){
   
   #last year of the new stock object
   lasty<-range(stock)["maxyear"]
-  stock@catch <- computeCatch(stock)
 
-  ## if catch < 10^-6 , give small value to total catch, remove catch at age (done some lines later)
+  ## if catch < 10^-5 , give small value to total catch, remove catch at age (done some lines later)
   ## and put the wt from year before. Not to have problems in SS3
-  stock@catch[,which(stock@catch<10^-6)]<-10^-6
-  stock@catch.wt[,which(stock@catch<10^-6)]<-stock@catch.wt[,ac(lasty-1)]
+  stock@catch.wt[,which(is.na(stock@catch.wt[2,]))]<-stock@catch.wt[,ac(2018)]
+  
+  stock@catch <- computeCatch(stock)
+  stock@catch[,which(stock@catch<10^-5)]<-10^-5
   
   #print
   cat("catches in it",runi,range(stock)["maxyear"],"\n", stock@catch[,ac(range(stock)["maxyear"])],"\n")
@@ -90,8 +91,8 @@ ss32flbeia<-function(stock,indices,control,covars=covars){
   lastrow<-dim(catchn)[1] 
   #ADI!!! no catch at age for the last year
   catchn<-catchn[-lastrow,]
-  ## remove catch at age when catch<10^6
-  catch0years<-which(min(catchn[,ac(1:6)])<10^-6)
+  ## remove catch at age when catch<10^4
+  catch0years<-which(catchn[,ac(4)]<10^-4)
   if(length(catch0years)>0){
   catchn<-catchn[-catch0years,]}
   # set manullay sample size for catch.n for years > 1999
