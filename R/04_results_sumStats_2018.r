@@ -28,12 +28,11 @@ t1 <- Sys.time()
 # WORKING DIRECTORY                                                        ----
 #==============================================================================
 
-# wd <- "C:/use/GitHub/FLBEIA_mseIBpil/" # main directory
-# setwd(wd)
+wd <- "C:/use/GitHub/FLBEIA_mseIBpil/" # main directory
+setwd(wd)
 
 # directory with results
 res.dir <- file.path("./output")
-
 
 #==============================================================================
 # LOAD LIBRARIES AND FUNCTIONS                                             ----
@@ -68,7 +67,7 @@ dat.bio.q <- data.frame()
 for (cs in scenario_list){
   
   # load file
-  obj <- loadToEnv( file.path("output/output_scenarios",paste("results2018_",cs,".RData",sep="")))[["out.bio"]]
+  obj <- loadToEnv( file.path(res.dir,"output_scenarios",paste("results2018_",cs,".RData",sep="")))[["out.bio"]]
   
   # combine all cases
   dat.bio.q <- rbind( dat.bio.q, bioSumQ(obj))
@@ -90,7 +89,7 @@ obsErr     <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[5], 
 dat.bio.q <- cbind( scenario, assessment, rule, rec, initNage, obsErr, dat.bio.q[,-c(1,3)])
 
 # Save data
-save( dat.bio.q, file="output/res_bio_all2018.RData")
+save( dat.bio.q, file=file.path(res.dir,"res_bio_all2018.RData"))
 rm( cs, dat.bio.q)
 
 
@@ -102,7 +101,7 @@ dat.eco.q <- data.frame()
 for (cs in scenario_list){
   
   # load file
-  obj <- loadToEnv( file.path("output/output_scenarios",paste("results2018_",cs,".RData",sep="")))[["out.flt"]]
+  obj <- loadToEnv( file.path(res.dir,"output_scenarios",paste("results2018_",cs,".RData",sep="")))[["out.flt"]]
   
   # combine all cases
   dat.eco.q <- rbind( dat.eco.q, fltSumQ(obj))
@@ -124,7 +123,7 @@ obsErr     <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[5], 
 dat.eco.q <- cbind( scenario, assessment, rule, rec, initNage, obsErr, dat.eco.q[,-c(1,3)])
 
 # Save data
-save( dat.eco.q, file="output/res_eco_all2018.RData")
+save( dat.eco.q, file=file.path(res.dir,"res_eco_all2018.RData"))
 rm( cs, assessment, rule, rec, initNage, obsErr, dat.eco.q)
 
 
@@ -136,7 +135,7 @@ dat.adv.q <- data.frame()
 for (cs in scenario_list){
   
   # load file
-  obj <- loadToEnv( file.path("output/output_scenarios",paste("results2018_",cs,".RData",sep="")))[["out.adv"]]
+  obj <- loadToEnv( file.path(res.dir,"output_scenarios",paste("results2018_",cs,".RData",sep="")))[["out.adv"]]
   
   # combine all cases
   dat.adv.q <- rbind( dat.adv.q, advSumQ(obj))
@@ -158,7 +157,7 @@ obsErr     <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[5], 
 dat.adv.q <- cbind( scenario, assessment, rule, rec, initNage, obsErr, dat.adv.q[,-c(1,3)])
 
 # Save data
-save( dat.adv.q, file="output/res_adv_all2018.RData")
+save( dat.adv.q, file=file.path(res.dir,"res_adv_all2018.RData"))
 rm( cs, assessment, rule, rec, initNage, obsErr, dat.adv.q)
 
 

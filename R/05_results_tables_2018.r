@@ -21,14 +21,15 @@
 
 rm(list=ls())
 
-
 #==============================================================================
 # WORKING DIRECTORY                                                        ----
 #==============================================================================
 
-# wd <- "C:/use/GitHub/FLBEIA_mseIBpil/" # main directory
-# setwd(wd)
+wd <- "C:/use/GitHub/FLBEIA_mseIBpil/" # main directory
+setwd(wd)
 
+# directory with results
+res.dir  <- file.path("./output")
 
 #==============================================================================
 # LOAD LIBRARIES AND FUNCTIONS                                             ----
@@ -45,7 +46,6 @@ library(R.utils)
 #==============================================================================
 
 source("./R/fun/ibpil_perfInd.R")
-
 
 #==============================================================================
 # SCENARIOS                                                               ----
@@ -68,13 +68,13 @@ length(scenario_list)
 proj.yr <- 2018
 qs <- c("q95","q50","q05")
 
-load( "./output/res_bio_all2018.RData")    # dat.bio.q
+load(file.path(res.dir,"res_bio_all2018.RData"))    # dat.bio.q
 # dat.bio.q$stock <- NULL
 
-load( "./output/res_eco_all2018.RData")    # dat.eco.q
+load( file.path(res.dir,"res_eco_all2018.RData"))    # dat.eco.q
 dat.eco.q <- dat.eco.q[,c("year","scenario",paste("effort",qs,sep="_"))]
 
-load( "./output/res_adv_all2018.RData")    # dat.adv.q
+load( file.path(res.dir,"res_adv_all2018.RData"))    # dat.adv.q
 dat.adv.q <- dat.adv.q[,c("year","scenario",paste("tac",qs,sep="_"))]  #,paste("quotaUpt",qs,sep="_")
 
 out.byr <- merge(dat.bio.q, dat.eco.q, by=c("scenario","year"))
@@ -96,7 +96,7 @@ out <- out.byr
 out <- subset(out, year>=proj.yr)
 
 
-write.table( out, file=file.path("output","stats_byyr2018.csv"), dec = ".", sep = ";",
+write.table( out, file=file.path(res.dir, "stats_byyr2018.csv"), dec = ".", sep = ";",
              row.names = FALSE)
 rm( qs, dat.bio.q, dat.eco.q, dat.adv.q)
 
@@ -115,7 +115,7 @@ out.all <- NULL
 for (cs in scenario_list){
   
   obj <- perfInd.pil( obj.bio="out.bio", , obj.adv="out.adv", 
-                      scenario=cs, file.dat=file.path("output/output_scenarios",paste("results2018_",cs,".RData",sep="")),
+                      scenario=cs, file.dat=file.path(res.dir,"output_scenarios",paste("results2018_",cs,".RData",sep="")),
                       proj.yrs=proj.yrs, Blim=337448)
   
   out.all <- rbind(out.all, obj)
@@ -134,7 +134,7 @@ out <- cbind( scenario, assessment, rule, rec, initNage, obsErr, out.all[, -1])
 
 
 # Save data
-write.table( out, file="./output/stats2018.csv", dec = ".", sep = ";",
+write.table( out, file=file.path(res.dir,"stats2018.csv"), dec = ".", sep = ";",
              row.names = FALSE)
 rm( cs, obj, out.all, scenario, assessment, rule, rec, initNage, obsErr)
 rm( perfInd.pil, auxiliary.f, tacdif)

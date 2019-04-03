@@ -27,8 +27,6 @@ setwd(wd)
 # directory with results
 #res.dir  <- file.path("./output")
 res.dir  <- file.path("./output_med_innvar_indiceserror_1000it")
-# directory with plots
-plot.dir <- file.path("./plots")
 
 #==============================================================================
 # LOAD LIBRARIES AND FUNCTIONS                                             ----
