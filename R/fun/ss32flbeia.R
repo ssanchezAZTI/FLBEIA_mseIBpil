@@ -91,7 +91,7 @@ ss32flbeia<-function(stock,indices,control,covars=covars){
   #ADI!!! no catch at age for the last year
   catchn<-catchn[-lastrow,]
   ## remove catch at age when catch<10^6
-  catch0years<-which(catchn[,"4"]<10^-6)
+  catch0years<-which(min(catchn[,ac(1:6)])<10^-6)
   if(length(catch0years)>0){
   catchn<-catchn[-catch0years,]}
   # set manullay sample size for catch.n for years > 1999
