@@ -147,6 +147,7 @@ df.scaled <- as.data.frame(df.scaled)
 
 scnms <- scenario_list[1:4] # names of scenarios to be compared
 
+tiff(file.path(plot.dir,"example_radar.tif"), width=900, height=700)
 aux <- subset(df.scaled, scenario %in% scnms & indicator %in% c("Median_SSB","Median_lastSSB","average_catch","Risk3","Risk3_Low"))
 aux <- aux[order(aux$indicator), ] 
 p <- ggplot(data=aux, aes(x=indicator, y=value2, col=scenario, fill=scenario, group=scenario))+
@@ -161,6 +162,7 @@ p <- ggplot(data=aux, aes(x=indicator, y=value2, col=scenario, fill=scenario, gr
   ylab("")+
   ylim(c(0,1))
 print(p)
+dev.off()
 
 #==============================================================================
 # Read quantiles of the indicators per year

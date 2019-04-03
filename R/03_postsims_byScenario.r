@@ -37,14 +37,11 @@ ni <- 1000
 # WORKING DIRECTORY                                                        ----
 #==============================================================================
 
-# wd <- "C:/use/GitHub/FLBEIA_mseIBpil/" # main directory
-# setwd(wd)
+wd <- "C:/use/GitHub/FLBEIA_mseIBpil/" # main directory
+setwd(wd)
 
 # directory with results
 res.dir  <- file.path("./output")
-# directory with plots
-plot.dir <- file.path("./plots")
-
 
 #==============================================================================
 # LOAD LIBRARIES AND FUNCTIONS                                             ----
