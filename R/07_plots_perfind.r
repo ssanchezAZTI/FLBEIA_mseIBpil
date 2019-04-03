@@ -49,6 +49,15 @@ load(file.path(res.dir, "scenario_list.RData"))
 length(scenario_list)
 
 #==============================================================================
+# Load the reference points
+#==============================================================================
+
+# load the reference points
+
+load(file.path(wd, "input", "PIL_refpts2018.RData"))
+PIL_ref.pts
+
+#==============================================================================
 # Read performance statistics
 #==============================================================================
 
@@ -204,6 +213,29 @@ for (ind in unique(dfyr$indicator)){
 }
 dev.off()
 
+# specific plot: time series biomass 1+ with ref points
+
+scnms <- scenario_list[1:4] # names of scenarios to be compared
+tiff(file.path(plot.dir,paste("plots_series_biomass.tif",sep="")), , width=900, height=700)
+  aux <- subset(dfyr, indicator=="biomass" & scenario %in% scnms)
+  aux$year <- as.numeric(aux$year)
+  p <- ggplot(data=aux, aes(x=year, y=q50, color=scenario))+
+    geom_line()+
+    geom_ribbon(aes(x=year, ymin=q05, ymax=q95, fill=scenario), alpha=0.2)+
+    geom_hline(yintercept = PIL_ref.pts["Blim"], linetype = "longdash")+
+    geom_hline(yintercept = 0.8*PIL_ref.pts["Blim"], linetype = "longdash")+
+    geom_hline(yintercept = PIL_ref.pts["Bloss"], linetype = "longdash")+
+    geom_vline(xintercept = 2018, linetype = "longdash")+
+    theme_bw()+
+    theme(text=element_text(size=14),
+          title=element_text(size=14,face="bold"),
+          strip.text=element_text(size=14),
+          plot.title = element_text(hjust = 0.5))+
+    ylab("Biomass")+
+    expand_limits(y=0)+  # to expand lower limit of the y-axis to 0
+    ggtitle("")
+  print(p)
+dev.off()
 
 # relative changes of q50 in dfyr wrt to a base case scenario
 
