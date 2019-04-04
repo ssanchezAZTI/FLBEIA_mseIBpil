@@ -66,7 +66,7 @@ pilHCRs <- function(stocks, advice, advice.ctrl, year, season, stknm,...){
   
   rule <- advice.ctrl[[stknm]]$rule
 
-  if (rule %in% c(0:2)) {
+  if (rule %in% c(0:4)) {
     
     stk <- window(stk, start=yrsnumbs[1], end=yrsnumbs[year-1]) #! CHECK WHEN ASSESSMENT USED
     
@@ -181,10 +181,8 @@ pilHCRs <- function(stocks, advice, advice.ctrl, year, season, stknm,...){
     
     # STF End
     
-    
     ref.pts <- advice.ctrl[[stknm]]$ref.pts # matrix[n,it]  rows = Blim, Btrigger, Fmsy,....
     Cadv <- ifelse(advice.ctrl[[stknm]][['AdvCatch']][year+1] == TRUE, 'catch', 'landings')
-    
     
     # Last SSB (Age structured) or Biomass (Aggregated) estimate
     if(ageStruct) {
@@ -228,6 +226,38 @@ pilHCRs <- function(stocks, advice, advice.ctrl, year, season, stknm,...){
       b.pos <- apply(matrix(1:iter,1,iter),2, function(i) findInterval(b.datyr[i], Brefs[,i]))  # [it]
       Ftg   <- ifelse(b.pos == 0, 0, ifelse(b.pos == 1,(Flow-(Fmsy-Flow)*Bloss/(Blim-Bloss)) + 
                                                         ((Fmsy-Flow)/(Blim-Bloss))*b.datyr, Fmsy))
+    } else if (rule == 3) { # HCR3, same as HCR1 but with different parameters
+
+      # ad-hoc modification of rule parameters 
+      ref.pts['Blim',] <- 196334
+      ref.pts['Floss',] <- 0.027
+      ref.pts['Fmsy',] <- 0.032
+      
+      Brefs <- rbind(ref.pts['Bloss',],0.8*ref.pts['Blim',])
+
+      # Find where the SSB (Age structured) OR Biomass (Aggregated) in relation to Btrig points.
+      b.pos <- apply(matrix(1:iter,1,iter),2, function(i) findInterval(b.datyr[i], Brefs[,i]))  # [it]
+      Ftg   <- ifelse(b.pos == 0, 0, ifelse(b.pos == 1, ref.pts['Floss',], ref.pts['Fmsy',]))
+      
+      
+    }else if (rule == 4) { # HCR4: Same as HCR2 but with different parameters
+      
+      # ad-hoc modification of rule parameters 
+      ref.pts['Blim',] <- 196334
+      ref.pts['Flow',] <- 0.023
+      ref.pts['Fmsy',] <- 0.032
+
+      Flow <- ref.pts['Flow',]
+      Fmsy <- ref.pts['Fmsy',]
+      Bloss <- ref.pts['Bloss',]
+      Blim <- ref.pts['Blim',]
+      
+      Brefs <- rbind(ref.pts['Bloss',],ref.pts['Blim',])
+      
+      # Find where the SSB (Age structured) OR Biomass (Aggregated) in relation to Btrig points.
+      b.pos <- apply(matrix(1:iter,1,iter),2, function(i) findInterval(b.datyr[i], Brefs[,i]))  # [it]
+      Ftg   <- ifelse(b.pos == 0, 0, ifelse(b.pos == 1,(Flow-(Fmsy-Flow)*Bloss/(Blim-Bloss)) + 
+                                              ((Fmsy-Flow)/(Blim-Bloss))*b.datyr, Fmsy))
     }
         
       # Fill the 0-s and NA-s with almost 0 values to avoid problems when the fishery is closed for example, or there is no catch...
