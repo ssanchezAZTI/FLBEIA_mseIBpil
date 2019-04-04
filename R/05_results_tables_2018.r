@@ -52,7 +52,7 @@ source("./R/fun/ibpil_perfInd.R")
 #==============================================================================
 
 # names of the scenarios
-load(file.path("temporal_output", "scenario_list.RData"))
+load(file.path(res.dir, "scenario_list.RData"))
 
 length(scenario_list)
 
@@ -102,40 +102,91 @@ rm( qs, dat.bio.q, dat.eco.q, dat.adv.q)
 
 
 # Projection years
-proj.yrs <- unique(out$year)
+# proj.yrs <- unique(out$year)
 
+#Run the function perfInd.pil the number of times needed to estimate stats for all the different periods
 
 # - global
 #-----------
 
-out.all <- NULL
-
 #! NOTE: different Blim for each scenario!!!!!
+
+#initial years of projection 2019:2023
+
+out.all5 <- NULL
 
 for (cs in scenario_list){
   
-  obj <- perfInd.pil( obj.bio="out.bio", , obj.adv="out.adv", 
+  obj <- perfInd.pil( obj.bio="out.bio", obj.adv="out.adv", 
                       scenario=cs, file.dat=file.path(res.dir,"output_scenarios",paste("results2018_",cs,".RData",sep="")),
-                      proj.yrs=proj.yrs, Blim=337448)
+                      proj.yrs=2019:2023, Blim=337448, Blow=196334)
+  
+  out.all5 <- rbind(out.all5, obj)
+  
+}
+
+out.all5 <- cbind(period=rep("initial",dim(out.all5)[1]),out.all5)
+
+#first 10 years of projection 2019:2028
+
+out.all10 <- NULL
+
+for (cs in scenario_list){
+  
+  obj <- perfInd.pil( obj.bio="out.bio", obj.adv="out.adv", 
+                      scenario=cs, file.dat=file.path(res.dir,"output_scenarios",paste("results2018_",cs,".RData",sep="")),
+                      proj.yrs=2019:2028, Blim=337448, Blow=196334)
+  
+  out.all10 <- rbind(out.all10, obj)
+  
+}
+
+out.all10 <- cbind(period=rep("short",dim(out.all10)[1]),out.all10)
+
+#last 10 years of projection 2039:2048
+
+out.all.last <- NULL
+
+for (cs in scenario_list){
+  
+  obj <- perfInd.pil( obj.bio="out.bio", obj.adv="out.adv", 
+                      scenario=cs, file.dat=file.path(res.dir,"output_scenarios",paste("results2018_",cs,".RData",sep="")),
+                      proj.yrs=2039:2048, Blim=337448, Blow=196334)
+  
+  out.all.last <- rbind(out.all.last, obj)
+  
+}
+
+out.all.last <- cbind(period=rep("last",dim(out.all.last)[1]),out.all.last)
+
+#initial years of projection 2019:2048
+
+out.all <- NULL
+
+for (cs in scenario_list){
+  
+  obj <- perfInd.pil( obj.bio="out.bio", obj.adv="out.adv", 
+                      scenario=cs, file.dat=file.path(res.dir,"output_scenarios",paste("results2018_",cs,".RData",sep="")),
+                      proj.yrs=2019:2048, Blim=337448, Blow=196334)
   
   out.all <- rbind(out.all, obj)
   
 }
 
-# Separate scenario into different columns
-scenario   <- as.character(out.all$scenario)
-assessment <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[1], 4, nchar(x[1]))))
-rule       <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[2], 4, nchar(x[2]))))
-rec        <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[3], 4, nchar(x[3]))))
-initNage   <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[4], 4, nchar(x[4]))))
-obsErr     <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[5], 4, nchar(x[4]))))
+out.all <- cbind(period=rep("all",dim(out.all)[1]),out.all)
 
-out <- cbind( scenario, assessment, rule, rec, initNage, obsErr, out.all[, -1])
+out.all <- rbind(out.all5,out.all10,out.all.last,out.all)
+
+# Separate scenario into different columns
+library(tidyr)
+out.final <-
+  out.all %>%
+  separate(scenario, into = c("Ass", "Rule", "Rec", "INN", "OER"), sep = "_", keep = TRUE, remove=FALSE)
 
 
 # Save data
-write.table( out, file=file.path(res.dir,"stats2018.csv"), dec = ".", sep = ";",
+write.table( out.final, file=file.path(res.dir,"stats2018.csv"), dec = ".", sep = ";",
              row.names = FALSE)
-rm( cs, obj, out.all, scenario, assessment, rule, rec, initNage, obsErr)
+rm( cs, obj, out.all5,out.all10,out.all.last, out.all, out.final)
 rm( perfInd.pil, auxiliary.f, tacdif)
 
