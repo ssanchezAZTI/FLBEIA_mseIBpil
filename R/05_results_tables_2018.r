@@ -181,7 +181,7 @@ out.all <- rbind(out.all5,out.all10,out.all.last,out.all)
 library(tidyr)
 out.final <-
   out.all %>%
-  separate(scenario, into = c("Ass", "Rule", "Rec", "INN", "OER"), sep = "_", keep = TRUE)
+  separate(scenario, into = c("Ass", "Rule", "Rec", "INN", "OER"), sep = "_", keep = TRUE, remove=FALSE)
 
 
 # Save data
