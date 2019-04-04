@@ -162,12 +162,12 @@ nit <- 1
   
   advice.ctrl[["PIL"]]$rule    <- rule.sc
   
-  if (rule.sc==1 | rule.sc==3) {
+  if (rule.sc==1 | rule.sc==3 | rule.sc==5) {
     
     if(any(!c("Bloss","Blim","Floss","Fmsy") %in% rownames(advice.ctrl$PIL$ref.pts)))
       stop("Required reference points missing: Bloss, Blim, Floss, Fmsy")
     
-  } else if (rule.sc==2 | rule.sc==4) {
+  } else if (rule.sc==2 | rule.sc==4 | rule.sc==6) {
     
     if(any(!c("Bloss","Blim","Flow","Fmsy") %in% rownames(advice.ctrl$PIL$ref.pts)))
       stop("Required reference points missing: Bloss, Blim, Flow, Fmsy")
