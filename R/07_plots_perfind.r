@@ -2,7 +2,7 @@
 #  IBpil results - plots of performance statistics                             # 
 #------------------------------------------------------------------------------#
 #   AZTI-Tecnalia                                         #
-#   created:  02/04/2019                                                       #
+#   created:  04/04/2019                                                       #
 #   modified:                                                                  #
 ################################################################################
 
@@ -25,8 +25,7 @@ wd <- "C:/use/GitHub/FLBEIA_mseIBpil/" # main directory
 setwd(wd)
 
 # directory with results
-res.dir  <- file.path("./output")
-#res.dir  <- file.path("./output_med_innvar_indiceserror_1000it")
+res.dir  <- file.path("./temporal_output")
 # directory with plots
 plot.dir <- file.path("./plots")
 
@@ -67,8 +66,12 @@ df <- read.table(file.path(res.dir,"stats2018.csv"), header=T, sep=";")
 
 # reshape to the long format for ggplot
 
-df <- reshape(df, idvar=c("scenario","assessment","rule","rec","initNage","obsErr"), varying=list(7:ncol(df)), 
-              times=names(df)[7:ncol(df)], timevar="indicator", v.names="value", direction="long")
+df <- reshape(df, idvar=c("period","scenario","Ass","Rule","Rec","INN","OER"), varying=list(8:ncol(df)), 
+              times=names(df)[8:ncol(df)], timevar="indicator", v.names="value", direction="long")
+
+#period as an ordered factor for the figures
+
+df$period <- factor(df$period, levels=c("initial","short","last","all"))
 
 #==============================================================================
 # comparison of several performance statistics 
@@ -80,45 +83,170 @@ perfnms <- unique(df$indicator)
 
 # effect of fixed or variable initial population
 
-pdf(file.path(plot.dir,"plot_compare_initNage.pdf"), onefile=T)
+pdf(file.path(plot.dir,"plot_compare_by_periods.pdf"), onefile=T)
 for (ind in perfnms){
   aux <- subset(df, indicator %in% ind)
-  p <- ggplot(aux, aes(x=initNage, y=value, fill=initNage))+
+  p <- ggplot(aux, aes(x=period, y=value, fill=period))+
     geom_bar(stat="identity")+
-    facet_grid(interaction(assessment, rule) ~ rec)+
+    facet_grid(Ass + Rule ~ Rec)+
     ylab(ind)
+  if(length(grep("Risk", ind))>0){
+    p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+  }
+  if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
+    p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
+  }
   print(p)
 }
 dev.off()
 
-# comparison of rules for each SR case with variable initial population
+# comparison of rules for each SR case
 
-pdf(file.path(plot.dir,"plot_compare_rule_for_initNage_var.pdf"), onefile=T)
+pdf(file.path(plot.dir,"plot_compare_rule_initial.pdf"), onefile=T)
 for (ind in perfnms){
-  aux <- subset(df, initNage=="var" & indicator %in% ind)
-  aux$rule <- as.factor(aux$rule)
-  p <- ggplot(aux, aes(x=factor(rule), y=value, fill=rule))+
+  aux <- subset(df, indicator %in% ind & period=="initial")
+  aux$rule <- as.factor(aux$Rule)
+  p <- ggplot(aux, aes(x=factor(Rule), y=value, fill=Rule))+
     geom_bar(stat="identity")+
-    facet_grid(assessment ~ rec)+
+    facet_grid(Ass ~ Rec)+
     ylab(ind)
+  if(length(grep("Risk", ind))>0){
+    p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+  }
+  if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
+    p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
+  }
   print(p)
 }
 dev.off()
 
-# comparison of SRs for each rule with variable initial population
-
-pdf(file.path(plot.dir,"plot_compare_sr_for_initNage_var.pdf"), onefile=T)
+pdf(file.path(plot.dir,"plot_compare_rule_short.pdf"), onefile=T)
 for (ind in perfnms){
-  aux <- subset(df, initNage=="var" & indicator %in% ind)
-  aux$rule <- as.factor(aux$rule)
-  p <- ggplot(aux, aes(x=rec, y=value, fill=rec))+
+  aux <- subset(df, indicator %in% ind & period=="short")
+  aux$rule <- as.factor(aux$Rule)
+  p <- ggplot(aux, aes(x=factor(Rule), y=value, fill=Rule))+
     geom_bar(stat="identity")+
-    facet_grid(assessment ~ rule)+
+    facet_grid(Ass ~ Rec)+
     ylab(ind)
+  if(length(grep("Risk", ind))>0){
+    p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+  }
+  if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
+    p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
+  }
   print(p)
 }
 dev.off()
 
+pdf(file.path(plot.dir,"plot_compare_rule_last.pdf"), onefile=T)
+for (ind in perfnms){
+  aux <- subset(df, indicator %in% ind & period=="last")
+  aux$rule <- as.factor(aux$Rule)
+  p <- ggplot(aux, aes(x=factor(Rule), y=value, fill=Rule))+
+    geom_bar(stat="identity")+
+    facet_grid(Ass ~ Rec)+
+    ylab(ind)
+  if(length(grep("Risk", ind))>0){
+    p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+  }
+  if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
+    p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
+  }
+  print(p)
+}
+dev.off()
+
+pdf(file.path(plot.dir,"plot_compare_rule_all.pdf"), onefile=T)
+for (ind in perfnms){
+  aux <- subset(df, indicator %in% ind & period=="all")
+  aux$rule <- as.factor(aux$Rule)
+  p <- ggplot(aux, aes(x=factor(Rule), y=value, fill=Rule))+
+    geom_bar(stat="identity")+
+    facet_grid(Ass ~ Rec)+
+    ylab(ind)
+  if(length(grep("Risk", ind))>0){
+    p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+  }
+  if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
+    p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
+  }
+  print(p)
+}
+dev.off()
+
+# comparison of SRs for each rule 
+
+pdf(file.path(plot.dir,"plot_compare_sr_initial.pdf"), onefile=T)
+for (ind in perfnms){
+  aux <- subset(df, indicator %in% ind & period=="initial")
+  aux$rule <- as.factor(aux$Rule)
+  p <- ggplot(aux, aes(x=Rec, y=value, fill=Rec))+
+    geom_bar(stat="identity")+
+    facet_grid(Ass ~ Rule)+
+    ylab(ind)
+  if(length(grep("Risk", ind))>0){
+    p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+  }
+  if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
+    p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
+  }
+  print(p)
+}
+dev.off()
+
+pdf(file.path(plot.dir,"plot_compare_sr_short.pdf"), onefile=T)
+for (ind in perfnms){
+  aux <- subset(df, indicator %in% ind & period=="short")
+  aux$rule <- as.factor(aux$Rule)
+  p <- ggplot(aux, aes(x=Rec, y=value, fill=Rec))+
+    geom_bar(stat="identity")+
+    facet_grid(Ass ~ Rule)+
+    ylab(ind)
+  if(length(grep("Risk", ind))>0){
+    p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+  }
+  if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
+    p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
+  }
+  print(p)
+}
+dev.off()
+
+pdf(file.path(plot.dir,"plot_compare_sr_last.pdf"), onefile=T)
+for (ind in perfnms){
+  aux <- subset(df, indicator %in% ind & period=="last")
+  aux$rule <- as.factor(aux$Rule)
+  p <- ggplot(aux, aes(x=Rec, y=value, fill=Rec))+
+    geom_bar(stat="identity")+
+    facet_grid(Ass ~ Rule)+
+    ylab(ind)
+  if(length(grep("Risk", ind))>0){
+    p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+  }
+  if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
+    p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
+  }
+  print(p)
+}
+dev.off()
+
+pdf(file.path(plot.dir,"plot_compare_sr_all.pdf"), onefile=T)
+for (ind in perfnms){
+  aux <- subset(df, indicator %in% ind & period=="all")
+  aux$rule <- as.factor(aux$Rule)
+  p <- ggplot(aux, aes(x=Rec, y=value, fill=Rec))+
+    geom_bar(stat="identity")+
+    facet_grid(Ass ~ Rule)+
+    ylab(ind)
+  if(length(grep("Risk", ind))>0){
+    p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+  }
+  if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
+    p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
+  }
+  print(p)
+}
+dev.off()
 
 # To increase sizes, we should add in the code:
 # theme(text=element_text(size=10),
@@ -154,10 +282,11 @@ df.scaled <- as.data.frame(df.scaled)
 # example of radar plot to compare several performance statistics at the same time
 # for several scenarios
 
-scnms <- scenario_list[1:4] # names of scenarios to be compared
+scnms <- scenario_list # names of scenarios to be compared
 
 tiff(file.path(plot.dir,"example_radar.tif"), width=900, height=700)
-aux <- subset(df.scaled, scenario %in% scnms & indicator %in% c("Median_SSB","Median_lastSSB","average_catch","Risk3","Risk3_Low"))
+aux <- subset(df.scaled, period=="all" & scenario %in% scnms & 
+                indicator %in% c("Median_SSB","MP_Success","Median_catch","average_sd_catch","Risk3","Risk3_Low"))
 aux <- aux[order(aux$indicator), ] 
 p <- ggplot(data=aux, aes(x=indicator, y=value2, col=scenario, fill=scenario, group=scenario))+
 #  geom_polygon(alpha=0.2, lwd=1)+
@@ -191,10 +320,8 @@ rownames(dfyr) <- NULL
 # external pdf for all the indicators for the scenarios to be compared
 # indicators are: biomass, catch, discards, f, landings, rec, ssb, catch.iyv, land.iyv, effort and tac
 
-scnms <- scenario_list[1:4] # names of scenarios to be compared
-
+scnms <- scenario_list # names of scenarios to be compared
 pdf(file.path(plot.dir,paste("plots_series_indicators.pdf",sep="")), width=10)
-
 for (ind in unique(dfyr$indicator)){
   aux <- subset(dfyr, indicator==ind & scenario %in% scnms)
   aux$year <- as.numeric(aux$year)
@@ -208,14 +335,71 @@ for (ind in unique(dfyr$indicator)){
           strip.text=element_text(size=10),
           plot.title = element_text(hjust = 0.5))+
     ylab(ind)+
+    expand_limits(y=0)+
     ggtitle("")
+  if(ind %in% c("ssb")){
+    p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
+  }
   print(p)
 }
 dev.off()
 
+# compare scenarios with assessment error
+
+scnms <- scenario_list[grep("ASSss3",scenario_list)] # names of scenarios to be compared
+pdf(file.path(plot.dir,paste("plots_series_indicators_ASSss3.pdf",sep="")), width=10)
+for (ind in unique(dfyr$indicator)){
+  aux <- subset(dfyr, indicator==ind & scenario %in% scnms)
+  aux$year <- as.numeric(aux$year)
+  p <- ggplot(data=aux, aes(x=year, y=q50, color=scenario))+
+    geom_line()+
+    geom_ribbon(aes(x=year, ymin=q05, ymax=q95, fill=scenario), alpha=0.2)+
+    geom_vline(xintercept = 2018, linetype = "longdash")+
+    theme_bw()+
+    theme(text=element_text(size=10),
+          title=element_text(size=10,face="bold"),
+          strip.text=element_text(size=10),
+          plot.title = element_text(hjust = 0.5))+
+    ylab(ind)+
+    expand_limits(y=0)+
+    ggtitle("")
+  if(ind %in% c("ssb")){
+    p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
+  }
+  print(p)
+}
+dev.off()
+
+# compare scenarios without assessment error
+
+scnms <- scenario_list[grep("ASSnone",scenario_list)] # names of scenarios to be compared
+pdf(file.path(plot.dir,paste("plots_series_indicators_ASSnone.pdf",sep="")), width=10)
+for (ind in unique(dfyr$indicator)){
+  aux <- subset(dfyr, indicator==ind & scenario %in% scnms)
+  aux$year <- as.numeric(aux$year)
+  p <- ggplot(data=aux, aes(x=year, y=q50, color=scenario))+
+    geom_line()+
+    geom_ribbon(aes(x=year, ymin=q05, ymax=q95, fill=scenario), alpha=0.2)+
+    geom_vline(xintercept = 2018, linetype = "longdash")+
+    theme_bw()+
+    theme(text=element_text(size=10),
+          title=element_text(size=10,face="bold"),
+          strip.text=element_text(size=10),
+          plot.title = element_text(hjust = 0.5))+
+    ylab(ind)+
+    expand_limits(y=0)+
+    ggtitle("")
+  if(ind %in% c("ssb")){
+    p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
+  }
+  print(p)
+}
+dev.off()
+
+
 # specific plot: time series biomass 1+ with ref points
 
-scnms <- scenario_list[1:4] # names of scenarios to be compared
+scnms <- scenario_list # names of scenarios to be compared
 tiff(file.path(plot.dir,paste("plots_series_biomass.tif",sep="")), , width=900, height=700)
   aux <- subset(dfyr, indicator=="biomass" & scenario %in% scnms)
   aux$year <- as.numeric(aux$year)
@@ -254,7 +438,7 @@ for (scnm in scenario_list){
 
 pdf(file.path(plot.dir,paste("plots_series_indicators_relative.pdf",sep="")), width=10)
 
-scnms <- scenario_list[2:4] # names of scenarios to be compared wrt to the base case
+scnms <- scenario_list[-1] # names of scenarios to be compared wrt to the base case
 
 for (ind in unique(dfyr.rel$indicator)){
   aux <- subset(dfyr.rel, indicator==ind & scenario %in% scnms)
