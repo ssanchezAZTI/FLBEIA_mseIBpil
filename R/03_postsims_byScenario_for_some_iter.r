@@ -59,11 +59,15 @@ library(R.utils)
 
 load(file.path(res.dir, "scenario_list.RData"))
 
-length(scenario_list)
-
-# names of the scenarios
+# names of the scenarios from files in the folder
 # scenario_list
 files<-list.files(file.path(res.dir, "output_iters"))
+
+scenario_list<-unique(sapply(files,function(x){paste(strsplit(x,"_")[[1]][2:6],collapse="_")}))
+save(list=c("scenario_list"),file=file.path(res.dir, "scenario_list.RData"))
+length(scenario_list)
+
+
 #number of iterations for each scenarios, slect minimum
 min_ni<-min(sapply(1:length(scenario_list),function(x){length(grep(scenario_list[x], files))}))
 ni<-min(100,min_ni)

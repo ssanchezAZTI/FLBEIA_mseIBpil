@@ -27,7 +27,7 @@ setwd(wd)
 # directory with results
 res.dir  <- file.path("./temporal_output")
 # directory with plots
-plot.dir <- file.path("./plots")
+plot.dir <- file.path(res.dir,"plots")
 
 #==============================================================================
 # LOAD LIBRARIES AND FUNCTIONS                                             ----
