@@ -66,7 +66,7 @@ pilHCRs <- function(stocks, advice, advice.ctrl, year, season, stknm,...){
   
   rule <- advice.ctrl[[stknm]]$rule
 
-  if (rule %in% c(0:4)) {
+  if (rule %in% c(0:6)) {
     
     stk <- window(stk, start=yrsnumbs[1], end=yrsnumbs[year-1]) #! CHECK WHEN ASSESSMENT USED
     
@@ -247,6 +247,36 @@ pilHCRs <- function(stocks, advice, advice.ctrl, year, season, stknm,...){
       ref.pts['Flow',] <- 0.023
       ref.pts['Fmsy',] <- 0.032
 
+      Flow <- ref.pts['Flow',]
+      Fmsy <- ref.pts['Fmsy',]
+      Bloss <- ref.pts['Bloss',]
+      Blim <- ref.pts['Blim',]
+      
+      Brefs <- rbind(ref.pts['Bloss',],ref.pts['Blim',])
+      
+      # Find where the SSB (Age structured) OR Biomass (Aggregated) in relation to Btrig points.
+      b.pos <- apply(matrix(1:iter,1,iter),2, function(i) findInterval(b.datyr[i], Brefs[,i]))  # [it]
+      Ftg   <- ifelse(b.pos == 0, 0, ifelse(b.pos == 1,(Flow-(Fmsy-Flow)*Bloss/(Blim-Bloss)) + 
+                                              ((Fmsy-Flow)/(Blim-Bloss))*b.datyr, Fmsy))
+    }else if (rule == 5) { # HCR5, same as HCR1 but with different parameters
+      
+      # ad-hoc modification of rule parameters 
+      ref.pts['Floss',] <- 0.083
+      ref.pts['Fmsy',] <- 0.10
+      
+      Brefs <- rbind(ref.pts['Bloss',],0.8*ref.pts['Blim',])
+      
+      # Find where the SSB (Age structured) OR Biomass (Aggregated) in relation to Btrig points.
+      b.pos <- apply(matrix(1:iter,1,iter),2, function(i) findInterval(b.datyr[i], Brefs[,i]))  # [it]
+      Ftg   <- ifelse(b.pos == 0, 0, ifelse(b.pos == 1, ref.pts['Floss',], ref.pts['Fmsy',]))
+      
+      
+    }else if (rule == 6) { # HCR6: Same as HCR2 but with different parameters
+      
+      # ad-hoc modification of rule parameters 
+      ref.pts['Flow',] <- 0.071
+      ref.pts['Fmsy',] <- 0.10
+      
       Flow <- ref.pts['Flow',]
       Fmsy <- ref.pts['Fmsy',]
       Bloss <- ref.pts['Bloss',]
