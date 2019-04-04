@@ -26,7 +26,7 @@ setwd(wd)
 
 # directory with results
 #res.dir  <- file.path("./output")
-res.dir  <- file.path("./output_med_innvar_indiceserror_1000it")
+res.dir  <- file.path("./temporal_output")
 
 #==============================================================================
 # LOAD LIBRARIES AND FUNCTIONS                                             ----

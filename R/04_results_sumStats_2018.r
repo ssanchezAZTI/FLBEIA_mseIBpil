@@ -32,7 +32,7 @@ wd <- "C:/use/GitHub/FLBEIA_mseIBpil/" # main directory
 setwd(wd)
 
 # directory with results
-res.dir <- file.path("./output")
+res.dir <- file.path("./temporal_output")
 
 #==============================================================================
 # LOAD LIBRARIES AND FUNCTIONS                                             ----

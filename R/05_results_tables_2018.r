@@ -29,7 +29,7 @@ wd <- "C:/use/GitHub/FLBEIA_mseIBpil/" # main directory
 setwd(wd)
 
 # directory with results
-res.dir  <- file.path("./output")
+res.dir  <- file.path("./temporal_output")
 
 #==============================================================================
 # LOAD LIBRARIES AND FUNCTIONS                                             ----
@@ -52,7 +52,7 @@ source("./R/fun/ibpil_perfInd.R")
 #==============================================================================
 
 # names of the scenarios
-load(file.path("output", "scenario_list.RData"))
+load(file.path("temporal_output", "scenario_list.RData"))
 
 length(scenario_list)
 
