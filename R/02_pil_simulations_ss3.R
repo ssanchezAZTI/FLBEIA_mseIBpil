@@ -168,12 +168,12 @@ nit <- 1
   
   advice.ctrl[["PIL"]]$rule    <- rule.sc
   
-  if (rule.sc==1) {
+  if (rule.sc==1 | rule.sc==3) {
     
     if(any(!c("Bloss","Blim","Floss","Fmsy") %in% rownames(advice.ctrl$PIL$ref.pts)))
       stop("Required reference points missing: Bloss, Blim, Floss, Fmsy")
     
-  } else if (rule.sc==2) {
+  } else if (rule.sc==2 | rule.sc==4) {
     
     if(any(!c("Bloss","Blim","Flow","Fmsy") %in% rownames(advice.ctrl$PIL$ref.pts)))
       stop("Required reference points missing: Bloss, Blim, Flow, Fmsy")
@@ -200,7 +200,7 @@ nit <- 1
   } else if (rec.sc=="low"){
     
     SRs <- SRs_LOW
-    advice.ctrl$PIL$ref.pts["Blim",] <- Blow # different Blim
+
     # Simulate from a lognormal distribution (mean=0, var=same as the estimated in SR model fitting)
     SRs$PIL@uncertainty[,proj.yrs,,,] <-
       exp(rnorm(length(proj.yrs), 0, residsd_low))
