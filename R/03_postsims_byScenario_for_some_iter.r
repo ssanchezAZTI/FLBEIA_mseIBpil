@@ -68,9 +68,12 @@ save(list=c("scenario_list"),file=file.path(res.dir, "scenario_list.RData"))
 length(scenario_list)
 
 
-#number of iterations for each scenarios, slect minimum
+#number of iterations for each scenarios, select minimum
 min_ni<-min(sapply(1:length(scenario_list),function(x){length(grep(scenario_list[x], files))}))
 ni<-min(ni,min_ni)
+
+cat("common number of iters:", ni)
+cat("each scenario has:", sapply(1:length(scenario_list),function(x){length(grep(scenario_list[x], files))})) 
 
 #==============================================================================
 #  Join the results (summary statistics):                                  ----
