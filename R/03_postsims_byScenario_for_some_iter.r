@@ -70,7 +70,7 @@ length(scenario_list)
 
 #number of iterations for each scenarios, slect minimum
 min_ni<-min(sapply(1:length(scenario_list),function(x){length(grep(scenario_list[x], files))}))
-ni<-min(100,min_ni)
+ni<-min(ni,min_ni)
 
 #==============================================================================
 #  Join the results (summary statistics):                                  ----
