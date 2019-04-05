@@ -351,6 +351,32 @@ df.scaled <- df %>% group_by(indicator) %>%
 
 df.scaled <- as.data.frame(df.scaled)
 
+# radar plot 
+
+for (rr in c("low","med","mix")){
+  scnms <- scenario_list # names of scenarios to be compared
+  scnms <- scenario_list[grep(paste("REC",rr,sep=""),scenario_list)] # names of scenarios to be compared
+  for (cs in c("initial","short","last","all")){
+    tiff(file.path(plot.dir,paste("radar_REC_",rr,"_period_",cs,".tif",sep="")), width=900, height=700)
+    aux <- subset(df.scaled, period==cs & scenario %in% scnms & 
+                    indicator %in% c("Mean_SSB","average_catch","average_sd_catch","MP_Success","Risk3","Risk3_Low"))
+    aux <- aux[order(aux$indicator), ] 
+    p <- ggplot(data=aux, aes(x=indicator, y=value2, col=scenario, fill=scenario, group=scenario))+
+      #  geom_polygon(alpha=0.2, lwd=1)+
+      geom_polygon(fill=NA, lwd=1)+
+      geom_point(cex=1.5)+
+      coord_radar()+
+      theme_bw()+
+      theme(text=element_text(size=14),
+            strip.text=element_text(size=14),
+            title=element_text(size=18,face="bold"))+
+      ylab("")+
+      ylim(c(0,1))
+    print(p)
+    dev.off()
+  }
+}
+
 # example of radar plot to compare several performance statistics at the same time
 # for several scenarios
 
