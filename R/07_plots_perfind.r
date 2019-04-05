@@ -25,7 +25,7 @@ wd <- "C:/use/GitHub/FLBEIA_mseIBpil/" # main directory
 setwd(wd)
 
 # directory with results
-res.dir  <- file.path("./temporal_output")
+res.dir  <- file.path("./output")
 # directory with plots
 plot.dir <- file.path(res.dir,"plots")
 
@@ -92,7 +92,15 @@ for (ind in perfnms){
     ylab(ind)
   if(length(grep("Risk", ind))>0){
     p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+    p <- ylim(c(0,1)) 
   }
+  if(ind %in% c("MP_Success","MP_Success_Low")){
+    p <- p + geom_hline(yintercept = 0.9, linetype = "longdash")
+    p <- p + ylim(c(0,1)) 
+  }  
+  if(ind %in% c("closure","closure_once")){
+    p <- p + ylim(c(0,1)) 
+  }  
   if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
     p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
   }
@@ -112,7 +120,15 @@ for (ind in perfnms){
     ylab(ind)
   if(length(grep("Risk", ind))>0){
     p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+    p <- ylim(c(0,1)) 
   }
+  if(ind %in% c("MP_Success","MP_Success_Low")){
+    p <- p + geom_hline(yintercept = 0.9, linetype = "longdash")
+    p <- p + ylim(c(0,1)) 
+  }  
+  if(ind %in% c("closure","closure_once")){
+    p <- p + ylim(c(0,1)) 
+  }  
   if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
     p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
   }
@@ -130,7 +146,15 @@ for (ind in perfnms){
     ylab(ind)
   if(length(grep("Risk", ind))>0){
     p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+    p <- ylim(c(0,1)) 
   }
+  if(ind %in% c("MP_Success","MP_Success_Low")){
+    p <- p + geom_hline(yintercept = 0.9, linetype = "longdash")
+    p <- p + ylim(c(0,1)) 
+  }  
+  if(ind %in% c("closure","closure_once")){
+    p <- p + ylim(c(0,1)) 
+  }  
   if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
     p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
   }
@@ -148,7 +172,15 @@ for (ind in perfnms){
     ylab(ind)
   if(length(grep("Risk", ind))>0){
     p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+    p <- ylim(c(0,1)) 
   }
+  if(ind %in% c("MP_Success","MP_Success_Low")){
+    p <- p + geom_hline(yintercept = 0.9, linetype = "longdash")
+    p <- p + ylim(c(0,1)) 
+  }  
+  if(ind %in% c("closure","closure_once")){
+    p <- p + ylim(c(0,1)) 
+  }  
   if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
     p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
   }
@@ -166,7 +198,15 @@ for (ind in perfnms){
     ylab(ind)
   if(length(grep("Risk", ind))>0){
     p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+    p <- ylim(c(0,1)) 
   }
+  if(ind %in% c("MP_Success","MP_Success_Low")){
+    p <- p + geom_hline(yintercept = 0.9, linetype = "longdash")
+    p <- p + ylim(c(0,1)) 
+  }  
+  if(ind %in% c("closure","closure_once")){
+    p <- p + ylim(c(0,1)) 
+  }  
   if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
     p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
   }
@@ -186,7 +226,15 @@ for (ind in perfnms){
     ylab(ind)
   if(length(grep("Risk", ind))>0){
     p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+    p <- ylim(c(0,1)) 
   }
+  if(ind %in% c("MP_Success","MP_Success_Low")){
+    p <- p + geom_hline(yintercept = 0.9, linetype = "longdash")
+    p <- p + ylim(c(0,1)) 
+  }  
+  if(ind %in% c("closure","closure_once")){
+    p <- p + ylim(c(0,1)) 
+  }  
   if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
     p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
   }
@@ -204,7 +252,15 @@ for (ind in perfnms){
     ylab(ind)
   if(length(grep("Risk", ind))>0){
     p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+    p <- ylim(c(0,1)) 
   }
+  if(ind %in% c("MP_Success","MP_Success_Low")){
+    p <- p + geom_hline(yintercept = 0.9, linetype = "longdash")
+    p <- p + ylim(c(0,1)) 
+  }  
+  if(ind %in% c("closure","closure_once")){
+    p <- p + ylim(c(0,1)) 
+  }  
   if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
     p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
   }
@@ -222,7 +278,15 @@ for (ind in perfnms){
     ylab(ind)
   if(length(grep("Risk", ind))>0){
     p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+    p <- ylim(c(0,1)) 
   }
+  if(ind %in% c("MP_Success","MP_Success_Low")){
+    p <- p + geom_hline(yintercept = 0.9, linetype = "longdash")
+    p <- p + ylim(c(0,1)) 
+  }  
+  if(ind %in% c("closure","closure_once")){
+    p <- p + ylim(c(0,1)) 
+  }  
   if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
     p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
   }
@@ -240,7 +304,15 @@ for (ind in perfnms){
     ylab(ind)
   if(length(grep("Risk", ind))>0){
     p <- p + geom_hline(yintercept = 0.05, linetype = "longdash")
+    p <- ylim(c(0,1)) 
   }
+  if(ind %in% c("MP_Success","MP_Success_Low")){
+    p <- p + geom_hline(yintercept = 0.9, linetype = "longdash")
+    p <- p + ylim(c(0,1)) 
+  }  
+  if(ind %in% c("closure","closure_once")){
+    p <- p + ylim(c(0,1)) 
+  }  
   if(ind %in% c("p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB")){
     p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
   }

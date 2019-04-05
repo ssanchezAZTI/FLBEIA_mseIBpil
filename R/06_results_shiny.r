@@ -26,7 +26,7 @@ setwd(wd)
 
 # directory with results
 #res.dir  <- file.path("./output")
-res.dir  <- file.path("./temporal_output")
+res.dir  <- file.path("./output")
 
 #==============================================================================
 # LOAD LIBRARIES AND FUNCTIONS                                             ----
