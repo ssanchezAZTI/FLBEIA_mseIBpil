@@ -611,10 +611,10 @@ for (scenario in scenario_list){
 successyr <- subset(successyr, year>2017)
 
 pdf(file.path(plot.dir,paste("pblim_by_yr.pdf",sep="")), width=10)
-for (scenario in scenario_list){
-  p <- ggplot(subset(successyr, scenario==scenario), aes(x=year,y=pblim))+
+for (sc in scenario_list){
+  p <- ggplot(subset(successyr, scenario==sc), aes(x=year,y=pblim))+
     geom_line()+
-    geom_vline(xintercept = 0.95, linetype = "longdash")+
+    geom_hline(yintercept = 0.95, linetype = "longdash")+
     ylim(c(0,1))+
     theme(text=element_text(size=10),
           title=element_text(size=10,face="bold"),
@@ -639,10 +639,10 @@ dev.off()
 
 
 pdf(file.path(plot.dir,paste("p80blim_by_yr.pdf",sep="")), width=10)
-for (scenario in scenario_list){
-  p <- ggplot(subset(successyr, scenario==scenario), aes(x=year,y=p80blim))+
+for (sc in scenario_list){
+  p <- ggplot(subset(successyr, scenario==sc), aes(x=year,y=p80blim))+
     geom_line()+
-    geom_vline(xintercept = 0.9, linetype = "longdash")+
+    geom_hline(yintercept = 0.9, linetype = "longdash")+
     ylim(c(0,1))+
     theme(text=element_text(size=10),
           title=element_text(size=10,face="bold"),
