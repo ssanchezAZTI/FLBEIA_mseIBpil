@@ -49,9 +49,13 @@ library(data.table)
 
 load(file.path(res.dir, "scenario_list.RData"))
 
+#update<
+files<-list.files(file.path(res.dir,"output_scenarios"))
+scenario_list<-unique(sapply(gsub('.{6}$', '', files),function(x){paste(strsplit(x,"_")[[1]][2:6],collapse="_")}))
+save(list=c("scenario_list"),file=file.path(res.dir, "scenario_list.RData"))
+
 # names of the scenarios
 scenario_list
-
 
 #==============================================================================
 #  Results:                                                                ----
