@@ -26,6 +26,7 @@ rm(list=ls())
 #==============================================================================
 
 wd <- "C:/use/GitHub/FLBEIA_mseIBpil/" # main directory
+#wd <- "~/Documents/IPMA/SARDINE/ADVICE_MP/FLBEIA_mseIBpil"
 setwd(wd)
 
 # directory with results
@@ -117,7 +118,7 @@ out.all5 <- NULL
 
 for (cs in scenario_list){
   
-  obj <- perfInd.pil( obj.bio="out.bio", obj.adv="out.adv", 
+  obj <- perfInd.pil( obj.bio="out.bio",
                       scenario=cs, file.dat=file.path(res.dir,"output_scenarios",paste("results2018_",cs,".RData",sep="")),
                       proj.yrs=2019:2023, Blim=337448, Blow=196334)
   
@@ -133,7 +134,7 @@ out.all10 <- NULL
 
 for (cs in scenario_list){
   
-  obj <- perfInd.pil( obj.bio="out.bio", obj.adv="out.adv", 
+  obj <- perfInd.pil( obj.bio="out.bio", 
                       scenario=cs, file.dat=file.path(res.dir,"output_scenarios",paste("results2018_",cs,".RData",sep="")),
                       proj.yrs=2019:2028, Blim=337448, Blow=196334)
   
@@ -149,7 +150,7 @@ out.all.last <- NULL
 
 for (cs in scenario_list){
   
-  obj <- perfInd.pil( obj.bio="out.bio", obj.adv="out.adv", 
+  obj <- perfInd.pil( obj.bio="out.bio",  
                       scenario=cs, file.dat=file.path(res.dir,"output_scenarios",paste("results2018_",cs,".RData",sep="")),
                       proj.yrs=2039:2048, Blim=337448, Blow=196334)
   
@@ -159,23 +160,8 @@ for (cs in scenario_list){
 
 out.all.last <- cbind(period=rep("last",dim(out.all.last)[1]),out.all.last)
 
-#initial years of projection 2019:2048
 
-out.all <- NULL
-
-for (cs in scenario_list){
-  
-  obj <- perfInd.pil( obj.bio="out.bio", obj.adv="out.adv", 
-                      scenario=cs, file.dat=file.path(res.dir,"output_scenarios",paste("results2018_",cs,".RData",sep="")),
-                      proj.yrs=2019:2048, Blim=337448, Blow=196334)
-  
-  out.all <- rbind(out.all, obj)
-  
-}
-
-out.all <- cbind(period=rep("all",dim(out.all)[1]),out.all)
-
-out.all <- rbind(out.all5,out.all10,out.all.last,out.all)
+out.all <- rbind(out.all5,out.all10,out.all.last)
 
 # Separate scenario into different columns
 library(tidyr)

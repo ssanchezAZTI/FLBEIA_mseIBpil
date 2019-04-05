@@ -2,8 +2,7 @@
 #  Summary functions for IB sardine - summary results                          # 
 #------------------------------------------------------------------------------#
 #   Sonia Sanchez (AZTI-Tecnalia)                                              #
-#   created:  11/10/2018                                                       #
-#   modified: Laura Wise 04/01/2019                                            #
+#   created:  11/10/2018                                                       #                                            #
 ################################################################################
 
 # ibpil_perfInd.R - summary statistics for each scenario
@@ -20,8 +19,7 @@
 # perfInd.pil(obj) :: performance indicators for IB sardine  
 #------------------------------------------------------------------------------#
 
-perfInd.pil <- function( obj.bio="out.bio", obj.adv="out.adv",
-                         scenario, file.dat,
+perfInd.pil <- function( obj.bio="out.bio",scenario, file.dat,
                          proj.yrs=proj.yrs, Blim=337448, Blow=196334) {
   
   # biological data
@@ -30,7 +28,6 @@ perfInd.pil <- function( obj.bio="out.bio", obj.adv="out.adv",
   
   
   # compute biological data to derive the performance metrics
-  
   idx <-  xx$year %in% proj.yrs
   xx <- subset(xx, idx)
   
@@ -41,8 +38,6 @@ perfInd.pil <- function( obj.bio="out.bio", obj.adv="out.adv",
   nit <- length(it)
   yrnms <- proj.yrs
   nyr <- length(yrnms)
-  first.yr <- proj.yrs[1]
-  last.yr <- proj.yrs[nyr]
   mp_yr <- 2023
 
   
@@ -129,7 +124,7 @@ perfInd.pil <- function( obj.bio="out.bio", obj.adv="out.adv",
   out <- c(out, tmp)
   
   # quantiles catch
-  tmp <- quantile(xx[,'catch'],c(0.025,0.5,0.975))
+  tmp <- quantile(xx[,'catch'],c(0.05,0.5,0.95))
   out <- c(out,tmp)
   
   # Average catch
@@ -143,17 +138,17 @@ perfInd.pil <- function( obj.bio="out.bio", obj.adv="out.adv",
   
   out <- as.data.frame(matrix(out, nrow=1))
   
-  names(out) <- c( "p025_SSB","p05_SSB","Median_SSB","p95_SSB","p975_SSB","Mean_SSB","Median_lastSSB",
-                   "absDiff","percDif_SSB",
-                   "MP_Success","MP_Success_Low",
-                   "Risk1","Risk1_Low","Risk2","Risk2_Low",
-                   "Risk3","Risk3_Low",
-                   "years_SSB_under_Blim", "years_get_SSB_up_Blim",
-                   "years_SSB_under_Blow", "years_get_SSB_up_Blow",
+  names(out) <- c( "P5th_B1plus","P10th_B1plus","Median_B1plus","P90th_B1plus","P95th_B1plus","Mean_B1plus","Median_lastB1plus",
+                   "IAV1_B1plus","IAV2_B1plus",
+                   "P_B1plus_0.8Blim","P_B1plus_0.8Blow",
+                   "avg_P_B1plus_Blim","avg_P_B1plus_Blow","once_P_B1plus_Blim","once_P_B1plus_Blow",
+                   "max_P_B1plus_Blim","max_P_B1plus_Blow",
+                   "years_B1plus_under_Blim", "years_get_B1plus_up_Blim",
+                   "years_B1plus_under_Blow", "years_get_B1plus_up_Blow",
                    "closure", "closure_once", "years_closure",
-                   "p025_catch","Median_catch","p975_catch",
-                   "average_catch", "average_sd_catch",
-                   "absDif_catch","percDif_Catch")
+                   "P5th_Catch","Median_Catch","P95th_Catch",
+                   "Mean_Catch", "StDev_Catch",
+                   "IAV1_Catch","IAV2_Catch")
   
   out <- cbind(scenario=scenario, out)
   

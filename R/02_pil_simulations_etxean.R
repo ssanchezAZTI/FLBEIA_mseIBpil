@@ -81,7 +81,7 @@ nit <- 1
 # - HCR1: Preferred F
 # - HCR2: Increasing F
 
-  rule.sc <- 3 #1
+  rule.sc <- 5 #1
 
 # RECRUITMENT
 # - REClow: low recruitment regime
