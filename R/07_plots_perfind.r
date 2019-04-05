@@ -379,6 +379,8 @@ dev.off()
 # Similar plots to the ones used in FLBEIAShiny
 #==============================================================================
 
+# read data
+
 dfyr <- read.table(file.path(res.dir,"stats_byyr2018.csv"), header=T, sep=";")
 
 # reshape dat to the long format to use ggplot2
@@ -468,6 +470,64 @@ for (ind in unique(dfyr$indicator)){
 }
 dev.off()
 
+# compare scenarios with assessment error for each SR 
+
+for (cs in c("low","med","mix")){
+  scnms <- scenario_list[grep("ASSss3",scenario_list)] # names of scenarios to be compared
+  scnms <- scenario_list[grep(paste("REC",cs,sep=""),scenario_list)] # names of scenarios to be compared
+  pdf(file.path(plot.dir,paste("plots_series_indicators_ASSss3_REC",cs,".pdf",sep="")), width=10)
+  for (ind in unique(dfyr$indicator)){
+    aux <- subset(dfyr, indicator==ind & scenario %in% scnms)
+    aux$year <- as.numeric(aux$year)
+    p <- ggplot(data=aux, aes(x=year, y=q50, color=scenario))+
+      geom_line()+
+      geom_ribbon(aes(x=year, ymin=q05, ymax=q95, fill=scenario), alpha=0.2)+
+      geom_vline(xintercept = 2018, linetype = "longdash")+
+      theme_bw()+
+      theme(text=element_text(size=10),
+            title=element_text(size=10,face="bold"),
+            strip.text=element_text(size=10),
+            plot.title = element_text(hjust = 0.5))+
+      ylab(ind)+
+      expand_limits(y=0)+
+      ggtitle("")
+    if(ind %in% c("ssb")){
+      p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
+    }
+    print(p)
+  }
+  dev.off()
+}
+
+# compare scenarios with assessment error for each SR 
+
+for (cs in c(1,2,5,6)){
+  scnms <- scenario_list[grep("ASSss3",scenario_list)] # names of scenarios to be compared
+  scnms <- scenario_list[grep(paste("HCR",cs,sep=""),scenario_list)] # names of scenarios to be compared
+  pdf(file.path(plot.dir,paste("plots_series_indicators_ASSss3_HCR",cs,".pdf",sep="")), width=10)
+  for (ind in unique(dfyr$indicator)){
+    aux <- subset(dfyr, indicator==ind & scenario %in% scnms)
+    aux$year <- as.numeric(aux$year)
+    p <- ggplot(data=aux, aes(x=year, y=q50, color=scenario))+
+      geom_line()+
+      geom_ribbon(aes(x=year, ymin=q05, ymax=q95, fill=scenario), alpha=0.2)+
+      geom_vline(xintercept = 2018, linetype = "longdash")+
+      theme_bw()+
+      theme(text=element_text(size=10),
+            title=element_text(size=10,face="bold"),
+            strip.text=element_text(size=10),
+            plot.title = element_text(hjust = 0.5))+
+      ylab(ind)+
+      expand_limits(y=0)+
+      ggtitle("")
+    if(ind %in% c("ssb")){
+      p <- p + geom_hline(yintercept = c(196334, 337448), linetype = "longdash")
+    }
+    print(p)
+  }
+  dev.off()
+}
+
 
 # specific plot: time series biomass 1+ with ref points
 
@@ -529,3 +589,78 @@ for (ind in unique(dfyr.rel$indicator)){
 }
 dev.off()
 
+#==============================================================================
+# Plots to see whether the conditions are met
+#==============================================================================
+
+# load library
+
+library(dplyr)
+
+# read data and compute pblim and p80blim by year
+
+successyr <- NULL
+for (scenario in scenario_list){
+  load(file.path(res.dir,"output_scenarios",paste("results2018_",scenario,".RData",sep="")))
+  aux <- out.bio %>% 
+          group_by(scenario, year) %>% 
+          summarize(pblim=sum(biomass>337448)/length(biomass),
+                    p80blim=sum(biomass> 0.8 * 337448)/length(biomass))
+  successyr <- rbind(successyr, as.data.frame(aux))
+}
+successyr <- subset(successyr, year>2017)
+
+pdf(file.path(plot.dir,paste("pblim_by_yr.pdf",sep="")), width=10)
+for (scenario in scenario_list){
+  p <- ggplot(subset(successyr, scenario==scenario), aes(x=year,y=pblim))+
+    geom_line()+
+    geom_vline(xintercept = 0.95, linetype = "longdash")+
+    ylim(c(0,1))+
+    theme(text=element_text(size=10),
+          title=element_text(size=10,face="bold"),
+          strip.text=element_text(size=10),
+          plot.title = element_text(hjust = 0.5))+
+    ylab("P(SSB>Blim)")+
+    ggtitle("")
+  print(p)
+}
+p <- ggplot(successyr, aes(x=year,y=pblim, col=scenario))+
+  geom_line()+
+  geom_hline(yintercept = 0.95, linetype = "longdash")+
+  ylim(c(0,1))+
+  theme(text=element_text(size=10),
+        title=element_text(size=10,face="bold"),
+        strip.text=element_text(size=10),
+        plot.title = element_text(hjust = 0.5))+
+  ylab("P(SSB>Blim)")+
+  ggtitle("")
+print(p)
+dev.off()
+
+
+pdf(file.path(plot.dir,paste("p80blim_by_yr.pdf",sep="")), width=10)
+for (scenario in scenario_list){
+  p <- ggplot(subset(successyr, scenario==scenario), aes(x=year,y=p80blim))+
+    geom_line()+
+    geom_vline(xintercept = 0.9, linetype = "longdash")+
+    ylim(c(0,1))+
+    theme(text=element_text(size=10),
+          title=element_text(size=10,face="bold"),
+          strip.text=element_text(size=10),
+          plot.title = element_text(hjust = 0.5))+
+    ylab("P(SSB>Blim)")+
+    ggtitle("")
+  print(p)
+}
+p <- ggplot(successyr, aes(x=year,y=p80blim, col=scenario))+
+  geom_line()+
+  geom_hline(yintercept = 0.90, linetype = "longdash")+
+  ylim(c(0,1))+
+  theme(text=element_text(size=10),
+        title=element_text(size=10,face="bold"),
+        strip.text=element_text(size=10),
+        plot.title = element_text(hjust = 0.5))+
+  ylab("P(SSB>Blim)")+
+  ggtitle("")
+print(p)
+dev.off()
