@@ -640,7 +640,7 @@ for (sc in scenario_list){
           title=element_text(size=10,face="bold"),
           strip.text=element_text(size=10),
           plot.title = element_text(hjust = 0.5))+
-    ylab("P(SSB>Blim)")+
+    ylab("P(SSB>0.8Blim)")+
     ggtitle(sc)
   print(p)
 }
@@ -652,7 +652,7 @@ p <- ggplot(successyr, aes(x=year,y=p80blim, col=scenario))+
         title=element_text(size=10,face="bold"),
         strip.text=element_text(size=10),
         plot.title = element_text(hjust = 0.5))+
-  ylab("P(SSB>Blim)")+
+  ylab("P(SSB>0.8Blim)")+
   ggtitle("")
 print(p)
 dev.off()
