@@ -656,3 +656,43 @@ p <- ggplot(successyr, aes(x=year,y=p80blim, col=scenario))+
   ggtitle("")
 print(p)
 dev.off()
+
+#==============================================================================
+# Calculate nbr pop that reach Blim and 'would stay in med regime' by yr                                                               ----
+#==============================================================================
+
+#subset for RECmix
+scenarios <- scenario_list[grep("RECmix",scenario_list)]
+
+#auxiliary function
+ff <- function(pop, threshold) {
+  cut_year <- pop$year[which(pop$ssb >= threshold)[1]]
+  return(pop[pop$year >= cut_year, ])
+}
+
+nbrBlim <- NULL
+
+for (scenario in scenarios){
+  load(file.path(res.dir,"output_scenarios",paste("results2018_",scenario,".RData",sep="")))
+  aux <- subset(out.bio,year>2018)
+  yy <- lapply(split(aux, aux$iter), ff,threshold=337448)
+  tt <-plyr::rbind.fill(yy)
+  tt <- subset(tt,scenario == scenario)
+  rr <- tt %>%
+    group_by(scenario, year) %>% 
+    summarize(nbrPop=length(unique(iter)))
+  nbrBlim <- rbind(nbrBlim,as.data.frame(rr))
+}
+
+pdf(file.path(plot.dir,paste("nbrPopBlim_by_yr.pdf",sep="")), width=10)
+p <- ggplot(nbrBlim, aes(x=year,y=nbrPop, col=scenario))+
+  geom_line()+
+  theme(text=element_text(size=10),
+        title=element_text(size=10,face="bold"),
+        strip.text=element_text(size=10),
+        plot.title = element_text(hjust = 0.5))+
+  ylab("Nbr pop med regime")+
+  ggtitle("")
+print(p)
+dev.off()
+
