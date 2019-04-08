@@ -82,7 +82,7 @@ df$period <- factor(df$period, levels=c("initial","short","last"))
 perfnms <- unique(df$indicator)
 perflabels <- c( "P5th_B1plus","P10th_B1plus","Median_B1plus","P90th_B1plus","P95th_B1plus","Mean_B1plus","Median_lastB1plus",
                  "IAV1_B1plus","IAV2_B1plus",
-                 "P(B1+>0.8Blim)","P(B1+>0.8Blow)",
+                 "P(B1+>=0.8Blim)","P(B1+>=0.8Blow)","Nb years to get B1plus>=0.8Blim","Nb years to get B1plus>=0.8Blow",
                  "P(B1+<Blim)","P(B1+<Blow)","P(once B1+<Blim)","P(once B1+<Blow)",
                  "max P(B1+<Blim)","max P(B1p+<Blow)",
                  "Nb years B1+<Blim", "Nb years to get B1plus>Blim",
@@ -596,11 +596,11 @@ for (scenario in scenario_list){
   load(file.path(res.dir,"output_scenarios",paste("results2018_",scenario,".RData",sep="")))
   aux <- out.bio %>% 
           group_by(scenario, year) %>% 
-          summarize(pblim=sum(biomass>337448)/length(biomass),
-                    p80blim=sum(biomass> 0.8 * 337448)/length(biomass))
+          summarize(pblim=sum(biomass>=337448)/length(biomass),
+                    p80blim=sum(biomass>= 0.8 * 337448)/length(biomass))
   successyr <- rbind(successyr, as.data.frame(aux))
 }
-successyr <- subset(successyr, year>2017)
+successyr <- subset(successyr, year>2018)
 
 pdf(file.path(plot.dir,paste("pblim_by_yr.pdf",sep="")), width=10)
 for (sc in scenario_list){
@@ -612,7 +612,7 @@ for (sc in scenario_list){
           title=element_text(size=10,face="bold"),
           strip.text=element_text(size=10),
           plot.title = element_text(hjust = 0.5))+
-    ylab("P(SSB>Blim)")+
+    ylab("P(SSB>=Blim)")+
     ggtitle(sc)
   print(p)
 }
@@ -624,7 +624,7 @@ p <- ggplot(successyr, aes(x=year,y=pblim, col=scenario))+
         title=element_text(size=10,face="bold"),
         strip.text=element_text(size=10),
         plot.title = element_text(hjust = 0.5))+
-  ylab("P(SSB>Blim)")+
+  ylab("P(SSB>=Blim)")+
   ggtitle("")
 print(p)
 dev.off()
@@ -640,7 +640,7 @@ for (sc in scenario_list){
           title=element_text(size=10,face="bold"),
           strip.text=element_text(size=10),
           plot.title = element_text(hjust = 0.5))+
-    ylab("P(SSB>0.8Blim)")+
+    ylab("P(SSB>=0.8Blim)")+
     ggtitle(sc)
   print(p)
 }
@@ -652,7 +652,7 @@ p <- ggplot(successyr, aes(x=year,y=p80blim, col=scenario))+
         title=element_text(size=10,face="bold"),
         strip.text=element_text(size=10),
         plot.title = element_text(hjust = 0.5))+
-  ylab("P(SSB>0.8Blim)")+
+  ylab("P(SSB>=0.8Blim)")+
   ggtitle("")
 print(p)
 dev.off()
