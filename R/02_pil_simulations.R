@@ -172,9 +172,9 @@ nit <- 1
     if(any(!c("Bloss","Blim","Flow","Fmsy") %in% rownames(advice.ctrl$PIL$ref.pts)))
       stop("Required reference points missing: Bloss, Blim, Flow, Fmsy")
     
-  } else
+  } #else
     
-    stop("Check values in rule.sc")
+    #stop("Check values in rule.sc")
   
   
   # RECRUITMENT
