@@ -674,6 +674,7 @@ obs.ctrl_SS3$PIL$obs.curryr <- TRUE
 computed_qage<-(c(0,0.03363665, -0.06660685, -0.03524329,  0.18057145,  0.35486293, -0.16620986 ))
 
 indices_ss3$AcousticNumberAtAge@index.q[,]<-exp(computed_qage)
+indices_ss3$AcousticNumberAtAge@index.q[1,]<-0
 indices_ss3$DEPM@index.q[] <- 1.13371
 
 last_DEPM<-2017
