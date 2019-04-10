@@ -20,7 +20,7 @@
 # - A * B * uncAdd, if B < SSB
 # 
 # where uncAdd corresponds to the uncertainty for SSB > B,
-# with uncAdd = @uncertainty ^ ((sd of SR residuals for SSB <= B) / (sd of SR residuals for SSB <= B) - 1)
+# with uncAdd = @uncertainty ^ ((sd of SR residuals for SSB > B) / (sd of SR residuals for SSB <= B) - 1)
 
 segregmix <- function () 
 {

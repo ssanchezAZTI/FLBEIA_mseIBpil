@@ -321,7 +321,7 @@ pilHCRs <- function(stocks, advice, advice.ctrl, year, season, stknm,...){
       
       for(i in 1:iter){
         
-        if(rule == 1 & Ftg[i]==ref.pts['Floss',]){
+        if( (rule == 1 | rule==3 | rule==5) & Ftg[i]==ref.pts['Floss',]){
           fwd.ctrl <- fwdControl(data.frame(year = c(assyrnumb+1), quantity = c('f','ssb'),rel.year=c(NA,assyrnumb)))
           fwd.ctrl@trgtArray <- array(NA, dim = c(2, 3, 1:iter), dimnames=list(rep(assyrnumb+1,2), c("min","val","max"),iter=1:iter))
           #Set f 
