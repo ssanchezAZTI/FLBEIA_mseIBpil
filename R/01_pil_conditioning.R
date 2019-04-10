@@ -666,7 +666,14 @@ obs.ctrl_SS3$PIL$indObs <- list(AcousticNumberAtAge = list(indObs.model = "ageIn
                                 DEPM = list(indObs.model = "bioInd"))
 obs.ctrl_SS3$PIL$obs.curryr <- TRUE
 
-indices_ss3$AcousticNumberAtAge@index.q[,] <- c(0,rep(1.32276,6))
+#indices_ss3$AcousticNumberAtAge@index.q[,] <- c(0,rep(1.32276,6)), not correct, change to computed qage:
+##AcouSticN
+# > apply(log(AcousticN/natage),2,mean)
+# a0          a1          a2          a3          a4          a5          a6 
+# -Inf  0.03363665 -0.06660685 -0.03524329  0.18057145  0.35486293 -0.16620986 
+computed_qage<-(c(0,0.03363665, -0.06660685, -0.03524329,  0.18057145,  0.35486293, -0.16620986 ))
+
+indices_ss3$AcousticNumberAtAge@index.q[,]<-exp(computed_qage)
 indices_ss3$DEPM@index.q[] <- 1.13371
 
 last_DEPM<-2017

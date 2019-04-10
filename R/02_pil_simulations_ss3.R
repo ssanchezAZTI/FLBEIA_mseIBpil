@@ -277,6 +277,15 @@ if (oer.sc=="naq") {
   DEPM.errors[,]<-rlnorm(dim(DEPM.errors)[2], meanlog = 0, sdlog = sd_DEPM)
   indices$PIL$DEPM@index.q[,] <- indices$PIL$DEPM@index.q[,]  * DEPM.errors[,]
   
+  #update historical indices values to incorporate errors
+  
+  #AcousticNumberAtAge = stock.n * index.q (*index*0+1) too keep the NAs in the historical data
+  indices_ss3$AcousticNumberAtAge@index[,ac(hist.yrs)]<-biols$PIL@n[,ac(hist.yrs)]*indices_ss3$AcousticNumberAtAge@index.q[,ac(hist.yrs)]*(indices_ss3$AcousticNumberAtAge@index[,ac(hist.yrs)]*0+1)
+  
+  #biomas * index.q (weight in the stock for age 0 is 0)
+  indices_ss3$DEPM@index[,ac(hist.yrs)]<-ssb(biols$PIL)[,ac(hist.yrs)]*indices_ss3$DEPM@index.q[,ac(hist.yrs)]*(indices_ss3$DEPM@index[,ac(hist.yrs)]*0+1)
+  
+  
   
   # obsevation errors in catches at age or any other???
   
