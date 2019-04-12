@@ -73,33 +73,34 @@ nit <- 1
 # - ASSemul : emulator of the assessment (observation error in numbers at age)
 # - ASSss3  : assess with SS3 (with observation errors in population, harvest and indices)
 
-  ass.sc <- "ss3" #"none" # "emul", "ss3"
+  ass.sc <- "ss3" # "none", "emul", "ss3"
 
 # HCRs (pilHCRs variants)
 # - HCR0: ICES HCR (F-based HCR in absolute terms)
 # - HCR1: Preferred F
 # - HCR2: Increasing F
 
-  rule.sc <- 1 #2
+  rule.sc <- 1 # 1:7
 
 # RECRUITMENT
-# - REClow: low recruitment regime
-# - RECmed: medium recruitment regime
-# - RECmix: changing recruitment regime
+# - REClow   : low recruitment regime
+# - RECmed   : medium recruitment regime
+# - RECmix   : changing recruitment regime between low and medium
+# - REClowmed: low to medium recruitment regime
 
-  rec.sc <- "mix" #"mix" # "med", "low"
+  rec.sc <- "lowmed" # "med", "low", "mix", "lowmed"
 
 # INITIAL NUMBERS AT AGE
 # - INNfix: same initial numbers at age for all iterations
 # - INNvar: different initial numbers at age for all iterations
   
-  inn.sc <- "var" # "fix"
+  inn.sc <- "var" # "fix", "var"
   
 # OBSERVATION ERROR
 # - OERnone  : perfect observation
 # - OERnaq   : observation error in numbers at age and survey catchabilities
   
-  oer.sc <- "naq" # "naq" none
+  oer.sc <- "naq" # "none", "naq"
 
   
 # List of all the scenarios:
@@ -200,7 +201,7 @@ nit <- 1
   } else if (rec.sc=="low"){
     
     SRs <- SRs_LOW
-
+    
     # Simulate from a lognormal distribution (mean=0, var=same as the estimated in SR model fitting)
     SRs$PIL@uncertainty[,proj.yrs,,,] <-
       exp(rnorm(length(proj.yrs), 0, residsd_low))
@@ -212,8 +213,19 @@ nit <- 1
     # Simulate from a lognormal distribution (mean=0, var=same as the estimated in SR model fitting)
     SRs$PIL@uncertainty[,proj.yrs,,,] <-
       exp(rnorm(length(proj.yrs), 0, residsd_low))
-      SRs[["PIL"]]@covar$uncAdd[,ac(proj.yrs),] <- SRs[["PIL"]]@uncertainty[,ac(proj.yrs),] ^(residsd_med/residsd_low-1) 
-
+    SRs[["PIL"]]@covar$uncAdd[,ac(proj.yrs),] <- SRs[["PIL"]]@uncertainty[,ac(proj.yrs),] ^(residsd_med/residsd_low-1)
+    
+  } else if (rec.sc=="lowmed"){
+    
+    SRs <- SRs_LM
+    # Simulate from a lognormal distribution (mean=0, var=same as the estimated in SR model fitting)
+    SRs$PIL@uncertainty[,proj.yrs,,,] <-
+      exp(rnorm(length(proj.yrs), 0, residsd_low))
+    SRs[["PIL"]]@covar$uncAdd[,ac(proj.yrs),] <- SRs[["PIL"]]@uncertainty[,ac(proj.yrs),] ^(residsd_med/residsd_low-1)
+    
+    covars      <- covars_SRlowmed
+    covars.ctrl <- covars_SRlowmed.ctrl
+    
   } else
     
     stop("Check values in rec.sc")
@@ -238,14 +250,6 @@ nit <- 1
 if (oer.sc=="naq") {
   
   # obsevation errors in numbers at age
-  #! A SER POSIBLE CALCULAR LOS ERRORES EN EL FICHERO 01 Y GUARDARLOS EN EL FICHERO DE INPUTS PARA ESTE CODIGO
-  #! ASI TENDREMOS TRAZABILIDAD DE LOS DATOS
-  
-  
-  
-  # obsevation errors in survey catchabilities
-  
-  #! LO MISMO QUE ANTES PARA LA TRAZABILIDAD: intentar calcularlo dentro del 01 si es posible (hecho)
   
   #CATCH NUMBERS obs errors
   obs.ctrl$PIL$stkObs$land.nage.error[,]<-
@@ -253,6 +257,7 @@ if (oer.sc=="naq") {
            meanlog = catch_resid_logmeans, 
            sdlog = catch_resid_logsds)
   
+  # obsevation errors in survey catchabilities
   
   #SURVEYS obs errors
   # Simulate from a lognormal distribution
@@ -337,7 +342,8 @@ if (ass.sc == "ss3") {
 
 source("./R/fun/MP_HCR_IBpil.R")
 source("./R/fun/segregmix.R")
-
+source("./R/fun/segreg_reglow.R")
+  
 # source("./R/fun/PILassess.R")
  source("./R/fun/ss32flbeia.R")
     
