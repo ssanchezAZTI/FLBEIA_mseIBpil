@@ -1,9 +1,9 @@
 ################################################################################
-#  IBpil MSE conditioning                                                     # 
+#  IBpil MSE conditioning                                                      # 
 #------------------------------------------------------------------------------#
 #   Sonia Sanchez (AZTI-Tecnalia)                                              #
 #   created:  03/07/2018                                                       #
-#   modified: Laura Wise (assessment WGHANSA2018)                            #
+#   modified: Laura Wise (assessment WGHANSA2018)                              #
 ################################################################################
 
 # 01_pil_conditioning.r - MSE conditioning and settings
@@ -55,6 +55,7 @@ library(FLBEIA)
 library(r4ss)
 
 source("./R/fun/segregmix.R")
+source("./R/fun/segreg_reglow.R")
 
 
 #==============================================================================
@@ -358,12 +359,12 @@ biols$PIL@n[1,ac(ass.yr),] <- SRs_LOW$PIL@rec[,ac(ass.yr),] #! if proj.yr <- ass
                                                             #  02_pil_simulations.R using the SR scenario selected
 
 
-# - SRs for low productivity regime
+# - SRs for mixed productivity regime
 # - Hockey - stick with inflexion point at Blow
 
-pars <- c("a", "b", "A", "B", "uncAdd")
+pars <- c("a", "b", "A", "B")
 dnms <- dimnames(ssb(pilsr))
-params_mix <- FLPar( c(params_low, params_med, 1), 
+params_mix <- FLPar( c(params_low, params_med), 
                      dimnames = list( param=pars, year=dnms$year, season=dnms$season, iter=dnms$iter))
 covars_mix <- FLQuant( 1, dimnames=dimnames(ssb(pilsr)))
 
@@ -384,13 +385,6 @@ SRs_MIX[["PIL"]]@uncertainty[,ac(proj.yrs),] <- exp(rnorm(length(proj.yrs), 0, r
 
 SRs_MIX[["PIL"]]@covar$uncAdd[,ac(proj.yrs),] <- SRs_MIX[["PIL"]]@uncertainty[,ac(proj.yrs),] ^(residsd_med/residsd_low-1)
 
-# Estimate REC for assessment year (ass.yr):
-
-model <- as.list(eval(call(SRs_MIX$PIL@model))[[2]])[[3]]
-datam <- list(ssb=SRs_MIX$PIL@ssb[,ac(ass.yr-SRs_MIX$PIL@timelag[1,]),,SRs_MIX$PIL@timelag[2,],],
-              uncAdd=SRs_MIX$PIL@covar$uncAdd[,ac(ass.yr),,,])
-for(i in dimnames(SRs_MIX$PIL@params)$param) datam[[i]] <- c(SRs_MIX$PIL@params[i,ac(ass.yr),,])
-
 # uncertainty for the assessment year
 
 SRs_MIX[["PIL"]]@uncertainty[,ac(ass.yr),] <- exp(rnorm(1, 0, residsd_low))
@@ -399,12 +393,70 @@ SRs_MIX[["PIL"]]@uncertainty[,ac(ass.yr),] <- exp(rnorm(1, 0, residsd_low))
 
 SRs_MIX[["PIL"]]@covar$uncAdd[,ac(ass.yr),] <- SRs_MIX[["PIL"]]@uncertainty[,ac(ass.yr),] ^(residsd_med/residsd_low-1)
 
+# Estimate REC for assessment year (ass.yr):
+
+model <- as.list(eval(call(SRs_MIX$PIL@model))[[2]])[[3]]
+datam <- list(ssb=SRs_MIX$PIL@ssb[,ac(ass.yr-SRs_MIX$PIL@timelag[1,]),,SRs_MIX$PIL@timelag[2,],])
+for(i in dimnames(SRs_MIX$PIL@params)$param) 
+  datam[[i]] <- c(SRs_MIX$PIL@params[i,ac(ass.yr),,])
+for(i in names(SRs_MIX$PIL@covar)) 
+  datam[[i]] <-  c(SRs_MIX$PIL@covar[[i]][,ac(ass.yr),,,])
 
 SRs_MIX$PIL@rec[,ac(ass.yr),] <- eval( model, datam) * SRs_MIX[["PIL"]]@uncertainty[,ac(ass.yr),]
 
 biols$PIL@n[1,ac(ass.yr),] <- SRs_MIX$PIL@rec[,ac(ass.yr),] #! if proj.yr <- ass.yr+1, then this code line should be included in 
                                                             #  02_pil_simulations.R using the SR scenario selected
 
+# - SRs for productivity regime change (low to medium)
+# - differen Hockey - stick ( one with inflexion point at Blow and the other at Blim)
+
+pars <- c("a", "b", "A", "B")
+dnms <- dimnames(ssb(pilsr))
+params_lowmed <- FLPar( c(params_low, params_med), 
+                     dimnames = list( param=pars, year=dnms$year, season=dnms$season, iter=dnms$iter))
+covars_lowmed <- FLQuant( 1, dimnames=dimnames(ssb(pilsr)))
+
+SRs_LM <- list(PIL = FLSRsim( name = "PIL", model = "segreg",
+                               rec = rec(pilsr), ssb = ssb(pilsr),
+                               params = params_lowmed,
+                               uncertainty = FLQuant( NA, dimnames=dnms),
+                               proportion = FLQuant( 1, dimnames=dnms),
+                               covar = FLQuants(reglow=covars_lowmed, uncAdd=covars_lowmed),range=range(biols$PIL)[1:5]))
+
+SRs_LM$PIL@model <- "segreg_reglow"
+
+
+# uncertainty for the projection years
+
+SRs_LM[["PIL"]]@uncertainty[,ac(proj.yrs),] <- exp(rnorm(length(proj.yrs), 0, residsd_low))
+
+# covar for the projection years
+
+SRs_LM[["PIL"]]@covar$uncAdd[,ac(proj.yrs),] <- SRs_LM[["PIL"]]@uncertainty[,ac(proj.yrs),] ^(residsd_med/residsd_low-1)
+
+# uncertainty for the assessment year
+
+SRs_LM[["PIL"]]@uncertainty[,ac(ass.yr),] <- exp(rnorm(1, 0, residsd_low))
+
+# covar for the assessment year
+
+SRs_LM[["PIL"]]@covar$uncAdd[,ac(ass.yr),] <- SRs_LM[["PIL"]]@uncertainty[,ac(ass.yr),] ^(residsd_med/residsd_low-1)
+SRs_LM[["PIL"]]@covar$reglow[,ac(ass.yr),] <- ifelse( ssb(biols$PIL)[,ac(ass.yr),]>=Blim, 0, 1)
+
+# Estimate REC for assessment year (ass.yr):
+
+model <- as.list(eval(call(SRs_LM$PIL@model))[[2]])[[3]]
+datam <- list( ssb=SRs_LM$PIL@ssb[,ac(ass.yr-SRs_LM$PIL@timelag[1,]),,SRs_LM$PIL@timelag[2,],])
+for(i in dimnames(SRs_LM$PIL@params)$param)
+  datam[[i]] <- c(SRs_LM$PIL@params[i,ac(ass.yr),,])
+for(i in names(SRs_LM$PIL@covar)) 
+  datam[[i]] <- c(SRs_LM$PIL@covar[[i]][,ac(ass.yr),,,])
+
+
+SRs_LM$PIL@rec[,ac(ass.yr),] <- eval( model, datam) * SRs_LM[["PIL"]]@uncertainty[,ac(ass.yr),]
+
+biols$PIL@n[1,ac(ass.yr),] <- SRs_LM$PIL@rec[,ac(ass.yr),] #! if proj.yr <- ass.yr+1, then this code line should be included in 
+                                                           #  02_pil_simulations.R using the SR scenario selected
 
 
 # Biomass dynamics (for stocks in biomass) ----
@@ -596,12 +648,16 @@ fleets.ctrl$INT$PIL$discard.TAC.OS <- FALSE
 #==============================================================================
 
 covars <- NULL
+covars_SRlowmed <- list( reglow=SRs_LM$PIL@covar$reglow)
+
 
 #==============================================================================
 # COVARS CONTROLS                                                          ----
 #==============================================================================
 
 covars.ctrl <- NULL
+covars_SRlowmed.ctrl <- list( reglow=list( process.model="regimeCheck",
+                                           stock="PIL", Bref=Blim))
 
 
 #==============================================================================
@@ -819,10 +875,16 @@ main.ctrl$sim.years["initial"] <- 2018
 # SAVE FLBEIA INPUTS                                                       ----
 #==============================================================================
 
-save( biols, SRs_MED, SRs_LOW, SRs_MIX, residsd_med, residsd_low,catch_resid_logmeans,catch_resid_logsds,
-      fleets, covars, #indices,
-      indices_none,indices_ss3, advice, 
-      main.ctrl, biols.ctrl, fleets.ctrl, covars.ctrl, 
+save( biols, 
+      SRs_MED, SRs_LOW, SRs_MIX, SRs_LM, 
+      residsd_med, residsd_low, 
+      catch_resid_logmeans,catch_resid_logsds,
+      fleets, 
+      covars, covars_SRlowmed,
+      indices_none,indices_ss3, #indices,
+      advice, 
+      main.ctrl, biols.ctrl, fleets.ctrl, 
+      covars.ctrl, covars_SRlowmed.ctrl,
       obs.ctrl_perf, obs.ctrl_SS3, #obs.ctrl, 
       # PILstwa_obs.varlog, PILmat_obs.varlog, PILcwa_obs.varlog
       assess.ctrl_perf, assess.ctrl_emul, assess.ctrl_SS3, #assess.ctrl, 
@@ -832,4 +894,5 @@ save( biols, SRs_MED, SRs_LOW, SRs_MIX, residsd_med, residsd_low,catch_resid_log
       file=paste(wd_in,"PIL_input2018.RData",sep=""))
 
 save( PIL_ref.pts, file=paste(wd_in,"PIL_refpts2018.RData",sep=""))
+
 
