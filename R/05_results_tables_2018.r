@@ -161,9 +161,29 @@ for (cs in scenario_list){
 out.all.last <- cbind(period=rep("last",dim(out.all.last)[1]),out.all.last)
 
 
-out.all <- rbind(out.all5,out.all10,out.all.last)
+# all projection period 2019:2048
+
+out.all.all <- NULL
+
+for (cs in scenario_list){
+  
+  obj <- perfInd.pil( obj.bio="out.bio",  
+                      scenario=cs, file.dat=file.path(res.dir,"output_scenarios",paste("results2018_",cs,".RData",sep="")),
+                      proj.yrs=2019:2048, Blim=337448, Blow=196334)
+  
+  out.all.all <- rbind(out.all.all, obj)
+  
+}
+
+out.all.all <- cbind(period=rep("all",dim(out.all.all)[1]), out.all.all)
+
+
+# put all performance stats (for all periods) together
+
+out.all <- rbind(out.all5, out.all10, out.all.last, out.all.all)
 
 # Separate scenario into different columns
+
 library(tidyr)
 out.final <-
   out.all %>%
@@ -173,6 +193,41 @@ out.final <-
 # Save data
 write.table( out.final, file=file.path(res.dir,"stats2018.csv"), dec = ".", sep = ";",
              row.names = FALSE)
-rm( cs, obj, out.all5,out.all10,out.all.last, out.all, out.final)
+rm( cs, obj, out.all5, out.all10, out.all.last, out.all.all, out.all, out.final)
 rm( perfInd.pil, auxiliary.f, tacdif)
+
+
+#==============================================================================
+# tables for the report. NEED TO BE FURTHER ELLABORATED 
+#==============================================================================
+
+# load performance statistics for all the scenarios
+
+df <- read.table(file.path(res.dir,"stats2018.csv"), header=T, sep=";")
+
+library(dplyr)
+
+# tables for the report. TO BE COMPLETED
+
+aux <- df %>% subset(Rule %in% c("HCR1","HCR2") & Ass=="ASSnone") %>%
+  group_by(Rec, Rule) %>%
+  summarise(round(Median_B1plus[period=="initial"]/1000, 0),
+            round(Median_B1plus[period=="short"]/1000, 0),
+            round(Median_B1plus[period=="last"]/1000, 0),
+            round(Median_Catch[period=="initial"]/1000, 0),
+            round(Median_Catch[period=="short"]/1000, 0),
+            round(Median_Catch[period=="last"]/1000, 0),
+            round(IAV1_Catch[period=="initial"]/1000, 0),
+            round(IAV1_Catch[period=="short"]/1000, 0),
+            round(IAV1_Catch[period=="last"]/1000, 0),
+            round(closure[period=="initial"]*100, 0),
+            round(closure[period=="short"]*100, 0),
+            round(closure[period=="last"]*100, 0)
+  )
+
+write.table(t(aux), file=file.path(res.dir, "table_report_HCR1&2_ASSnone.csv"), sep=";")
+
+
+
+
 

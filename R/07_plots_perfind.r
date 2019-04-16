@@ -71,7 +71,9 @@ df <- reshape(df, idvar=c("period","scenario","Ass","Rule","Rec","INN","OER"), v
 
 #period as an ordered factor for the figures
 
-df$period <- factor(df$period, levels=c("initial","short","last"))
+df$period <- factor(df$period, levels=c("initial","short","last","all"))
+
+row.names(df) <- NULL
 
 #==============================================================================
 # comparison of several performance statistics 
