@@ -112,6 +112,11 @@ perfInd.pil <- function( obj.bio="out.bio",scenario, file.dat,
   tmp <- tapply( pBlim, list(xx$iter), auxiliary.f)
   out <- c(out, mean(tmp))
   
+  # Average number of years necessary to get SSB >= Blim with prob >=0.95
+  yrs.ICES <- which(ifelse((tapply( ifelse( xx[,'ssb'] >= Blim, 1, 0), list(xx$year), mean))>=0.95,1,0)==1)[1]
+  tmp <- proj.yrs[yrs.ICES]
+  out <- c(out, tmp)
+  
   # Average number of years that SSB < Blow
   tmp <- mean (tapply(pBlow, list(xx$iter), sum) )
   out <- c(out, tmp)
@@ -120,6 +125,11 @@ perfInd.pil <- function( obj.bio="out.bio",scenario, file.dat,
   tmp <- tapply( pBlow, list(xx$iter), auxiliary.f)
   out <- c(out, mean(tmp))
   
+  # Average number of years necessary to get SSB >= Blow with Prob>=0.95
+  yrs.ICES_Low <- which(ifelse((tapply( ifelse( xx[,'ssb'] >= Blow, 1, 0), list(xx$year), mean))>=0.95,1,0)==1)[1]
+  tmp <- proj.yrs[yrs.ICES_Low]
+  out <- c(out, tmp)
+
   # Probability that the fishery is closed
   pclosed <- ifelse( xx[,'catch'] <= 1e-6, 1, 0)
   tmp <- sum(pclosed) / (nit * nyr)
@@ -144,17 +154,17 @@ perfInd.pil <- function( obj.bio="out.bio",scenario, file.dat,
   out <- c(out, mean(tapply( xx[,'catch'], list(xx$iter), sd ) ))
   
   # Interanual variation
-  out <- c(out, apply(matrix(unlist(tapply( xx[,'catch'], list(xx$iter), tacdif) ), nrow=nit, byrow=T), 2, mean))
+  out <- c(out, apply(matrix(unlist(tapply( xx[,'catch'], list(xx$iter), tacdif) ), nrow=nit, byrow=T), 2, mean, na.rm=T))
   
   out <- as.data.frame(matrix(out, nrow=1))
   
   names(out) <- c( "P5th_B1plus","P10th_B1plus","Median_B1plus","P90th_B1plus","P95th_B1plus","Mean_B1plus","Median_lastB1plus",
                    "IAV1_B1plus","IAV2_B1plus",
-                   "P_B1plus_0.8Blim","P_B1plus_0.8Blow","years_B1plus_0.8Blim","years_B1plus_0.8Blow",
+                   "P_B1plus_0.8Blim","P_B1plus_0.8Blow","firstyear_B1plus_0.8Blim","firstyear_B1plus_0.8Blow",
                    "avg_P_B1plus_Blim","avg_P_B1plus_Blow","once_P_B1plus_Blim","once_P_B1plus_Blow",
                    "max_P_B1plus_Blim","max_P_B1plus_Blow",
-                   "years_B1plus_under_Blim", "years_get_B1plus_up_Blim",
-                   "years_B1plus_under_Blow", "years_get_B1plus_up_Blow",
+                   "years_B1plus_under_Blim", "years_get_B1plus_up_Blim","firstyear_B1plus_Blim",
+                   "years_B1plus_under_Blow", "years_get_B1plus_up_Blow","firstyear_B1plus_Blow",
                    "closure", "closure_once", "years_closure",
                    "P5th_Catch","Median_Catch","P95th_Catch",
                    "Mean_Catch", "StDev_Catch",
@@ -196,8 +206,8 @@ auxiliary.f <- function(x){
 
 tacdif <- function(dd){ # function to compute statistics for tac difference for 1 vector
   ny <- length(dd)
-  dif <- dd[2:ny]-dd[1:(ny-1)]
-  dd <- ifelse(dd<1.0e-06,NA,dd) #for catches zero we change to NA
+  dif <- abs(dd[2:ny]-dd[1:(ny-1)])
+  dd[dd<1.0e-06] <- NA # for catches zero we change to NA
   pdif <- dd[2:ny]/dd[1:(ny-1)]
   meandif <- mean(dif)
   meanpdif <- mean(pdif,na.rm=T)

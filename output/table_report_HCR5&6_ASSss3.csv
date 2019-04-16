@@ -1,0 +1,22 @@
+"Rec";"RECmed";"RECmed";"REClow";"REClow";"REClowmed";"REClowmed";"RECmix";"RECmix"
+"Rule";"HCR5";"HCR6";"HCR5";"HCR6";"HCR5";"HCR6";"HCR5";"HCR6"
+"round(Median_B1plus[period == \"initial\"]/1000, 0)";"249";"234";"208";"194";"208";"194";"214";"197"
+"round(Median_B1plus[period == \"short\"]/1000, 0)";"368";"340";"236";"218";"238";"218";"251";"227"
+"round(Median_B1plus[period == \"last\"]/1000, 0)";"530";"529";"239";"236";"288";"263";"322";"281"
+"round(Median_Catch[period == \"initial\"]/1000, 0)";" 3";"16";" 3";"16";" 2";"16";" 1";"14"
+"round(Median_Catch[period == \"short\"]/1000, 0)";"27";"24";"24";"20";"24";"20";" 4";"17"
+"round(Median_Catch[period == \"last\"]/1000, 0)";"45";"45";"30";"30";"36";"34";"34";"31"
+"round(IAV1_Catch[period == \"initial\"]/1000, 0)";"8";"4";"7";"3";"7";"3";"6";"3"
+"round(IAV1_Catch[period == \"short\"]/1000, 0)";"8";"5";"8";"4";"8";"4";"8";"3"
+"round(IAV1_Catch[period == \"last\"]/1000, 0)";"7";"7";"7";"4";"7";"6";"7";"5"
+"round(closure[period == \"initial\"] * 100, 0)";"35";" 1";"38";" 0";"32";" 0";"46";" 1"
+"round(closure[period == \"short\"] * 100, 0)";"22";" 0";"28";" 0";"22";" 0";"38";" 1"
+"round(closure[period == \"last\"] * 100, 0)";"0";"0";"6";"0";"3";"0";"6";"0"
+"round(P_B1plus_0.8Blim[period == \"initial\"] * 100, 0)";"78";"69";"31";"20";"32";"21";"40";"24"
+"round(P_B1plus_0.8Blow[period == \"initial\"] * 100, 0)";"98";"94";"95";"88";"96";"88";"98";"90"
+"round(firstyear_B1plus_0.8Blim[period == \"all\"], 0)";"2025";"2027";NA;NA;NA;NA;NA;NA
+"round(firstyear_B1plus_0.8Blow[period == \"all\"], 0)";"2021";"2022";"2022";"2024";"2022";"2024";"2022";"2024"
+"round(firstyear_B1plus_Blim[period == \"all\"], 0)";"2031";"2034";NA;NA;NA;NA;NA;NA
+"round(firstyear_B1plus_Blow[period == \"all\"], 0)";"2024";"2026";NA;NA;NA;NA;"2025";NA
+"round(max_P_B1plus_Blim[period == \"last\"] * 100, 0)";" 4";" 4";"97";"97";"62";"71";"56";"68"
+"round(max_P_B1plus_Blow[period == \"last\"] * 100, 0)";" 0";" 0";"19";"22";"12";"16";" 6";" 8"
