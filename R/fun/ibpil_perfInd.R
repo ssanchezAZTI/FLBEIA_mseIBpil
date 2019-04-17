@@ -68,12 +68,12 @@ perfInd.pil <- function( obj.bio="out.bio",scenario, file.dat,
   tmp <-  sum(p08Blow) / nit
   out <- c(out, tmp)
   
-  # Average number of years necessary to get SSB >= 0.8Blim
+  # First year necessary to get SSB >= 0.8Blim with prob 0.9
   yrs.MP <- which(ifelse((tapply( ifelse( xx[,'ssb'] >= 0.8*Blim, 1, 0), list(xx$year), mean))>=0.90,1,0)==1)[1]
   tmp <- proj.yrs[yrs.MP]
   out <- c(out, tmp)
   
-  # Average number of years necessary to get SSB >= 0.8Blow
+  # First year necessary to get SSB >= 0.8Blow with prob 0.9
   yrs.MP_Low <- which(ifelse((tapply( ifelse( xx[,'ssb'] >= 0.8*Blow, 1, 0), list(xx$year), mean))>=0.90,1,0)==1)[1]
   tmp <- proj.yrs[yrs.MP_Low]
   out <- c(out, tmp)
@@ -112,7 +112,7 @@ perfInd.pil <- function( obj.bio="out.bio",scenario, file.dat,
   tmp <- tapply( pBlim, list(xx$iter), auxiliary.f)
   out <- c(out, mean(tmp))
   
-  # Average number of years necessary to get SSB >= Blim with prob >=0.95
+  # First year necessary to get SSB >= Blim with prob >=0.95
   yrs.ICES <- which(ifelse((tapply( ifelse( xx[,'ssb'] >= Blim, 1, 0), list(xx$year), mean))>=0.95,1,0)==1)[1]
   tmp <- proj.yrs[yrs.ICES]
   out <- c(out, tmp)
