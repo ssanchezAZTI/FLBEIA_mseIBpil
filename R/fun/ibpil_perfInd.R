@@ -143,6 +143,10 @@ perfInd.pil <- function( obj.bio="out.bio",scenario, file.dat,
   tmp <- mean (tapply(pclosed, list(xx$iter), sum) )
   out <- c(out, tmp)
   
+  # quantiles F
+  tmp <- quantile(xx[,'f'],c(0.05,0.5,0.95))
+  out <- c(out,tmp)
+  
   # quantiles catch
   tmp <- quantile(xx[,'catch'],c(0.05,0.5,0.95))
   out <- c(out,tmp)
@@ -166,6 +170,7 @@ perfInd.pil <- function( obj.bio="out.bio",scenario, file.dat,
                    "years_B1plus_under_Blim", "years_get_B1plus_up_Blim","firstyear_B1plus_Blim",
                    "years_B1plus_under_Blow", "years_get_B1plus_up_Blow","firstyear_B1plus_Blow",
                    "closure", "closure_once", "years_closure",
+                   "P5th_F","Median_F","P95th_F",
                    "P5th_Catch","Median_Catch","P95th_Catch",
                    "Mean_Catch", "StDev_Catch",
                    "IAV1_Catch","IAV2_Catch")

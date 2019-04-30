@@ -90,6 +90,7 @@ perflabels <- c( "P5th_B1plus","P10th_B1plus","Median_B1plus","P90th_B1plus","P9
                  "Nb years B1+<Blim", "Nb years to get B1plus>Blim", "First year B1plus>Blim",
                  "Nb years B1+<Blow", "Nb years to get B1plus>Blow", "First year B1plus>Blow",
                  "P(closure)", "P(closure once)", "Nb yearsclosure",
+                 "P5th_F","Median_F","P95th_F",
                  "P5th_Catch","Median_Catch","P95th_Catch",
                  "Mean_Catch", "StDev_Catch",
                  "IAV1_Catch","IAV2_Catch")
