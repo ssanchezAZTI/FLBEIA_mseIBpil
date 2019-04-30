@@ -5,7 +5,7 @@ setwd("~/GitHub/FLBEIA_mseIBpil/")
 Blim <- 337448
 
 
-for (sc in c("ASSss3_HCR6_RECmix_INNvar_OERnaq", "ASSss3_HCR6_RECmed_INNvar_OERnaq")) {
+for (sc in c("ASSss3_HCR1_RECmix_INNvar_OERnaq", "ASSss3_HCR1_REClowmed_INNvar_OERnaq")) {
   
   print(sc)
   
@@ -29,23 +29,28 @@ for (sc in c("ASSss3_HCR6_RECmix_INNvar_OERnaq", "ASSss3_HCR6_RECmed_INNvar_OERn
     yrc <- which(d1==TRUE)[1]               # first year with SSB>=Blim
     if (!is.na(yrc)) {
       lml <- any(d1[yrc:length(d1)]==FALSE) # falling again below Blim?
-      nr  <- 0                              # iteration with no recovery? (i.e. always SSB<Blim)
+      lm <- all(d1[yrc:length(d1)]==TRUE) # keep above Blim?
+      nr  <- 0                            # iteration with no recovery? (i.e. always SSB<Blim)
     } else {
       lml <- FALSE  # falling again below Blim?
+      lm <- FALSE
       nr <- 1       # iteration with no recovery? (i.e. always SSB<Blim)
     }
     
-    res <- rbind(res, c(it, d1, lml, nr))
+    res <- rbind(res, c(it, d1, lml, lm, nr))
   }
   
-  names(res) <- c("iter", dd$year, "low_mix_low", "no_recover")
+  names(res) <- c("iter", dd$year, "low_med_low","low_med", "no_recover")
   
   # res
   
-  plml <- sum(res$low_mix_low)/nrow(res) # 0.168 (mix) | 0.306 (med)
-  print(paste("Prob low-mix-low:", plml))
+  plml <- sum(res$low_med_low)/nrow(res) 
+  print(paste("Prob low-med-low:", plml))
   
-  pnr  <- sum(res$no_recover)/nrow(res)  # 0.47  (mix) | 0.001 (med)
+  plm <- sum(res$low_med)/nrow(res) 
+  print(paste("Prob low-med:", plm)) 
+  
+  pnr  <- sum(res$no_recover)/nrow(res)  
   print(paste("Prob no recover:", pnr))
   
   
