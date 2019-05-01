@@ -76,15 +76,13 @@ dfyr%>%
 # runs without assessment and no observation error
 
 dfyr %>%
-  select(-scenario, -q05, -q95,-obsErr) %>%
+  dplyr::select(-scenario, -q05, -q95,-obsErr) %>%
   spread(assessment, q50) %>%
   mutate(ss3_relbias = (ss3 - none) / none) %>%
   as.data.frame -> relbias
 
 # subset data.frame for variables of interest
 relbias <- subset(relbias, indicator %in% c("ssb","f"))
-
-
 
 ##PLOTS for ASSss3 comparison with ASSnone
 facet_names <- c('catch'= "Catch",'f'="Fbar",'rec'="Rec",'ssb'="B1+",'1'="HCR1",'2'="HCR2",'3'="HCR3",'4'="HCR4",'5'="HCR5",'6'="HCR6",'7'="HCR7")
@@ -229,8 +227,8 @@ load("~/Documents/IPMA/SARDINE/ADVICE_MP/FLBEIA_mseIBpil/data/ASSss3_historicalD
 ##make data.frame joining historical data with projection data 
 dfyr %>%
   filter(year == 2018) %>%
-  select(-year, -q05, -q50, -q95) %>%
-  left_join(all) %>% as.data.frame-> tt
+  dplyr::select(-year, -q05, -q50, -q95) %>%
+  left_join(all) %>% as.data.frame -> tt
 
 dfyr %>%
   bind_rows(
@@ -240,36 +238,78 @@ dfyr %>%
 ww <- subset(ww,assessment=="ss3")
 ww$indicator2 <- factor(ww$indicator, levels=c("rec","ssb","f","catch"))
 
+#Data from two iters
+out.all <- NULL
+for (cs in scenario_list){
+  
+  file.dat <- file.path(res.dir,"output_scenarios",paste("results2018_",cs,".RData",sep=""))
+  aux <- loadToEnv(file.dat)[["out.bio"]]
+  aux <- subset(aux, iter %in% c(45,235))
+  aux <- subset(aux, year>2017)
+  
+  out.all <- rbind(out.all, aux)
+  
+}
+
+scenario   <- as.character(out.all$scenario)
+assessment <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[1], 4, nchar(x[1]))))
+rule       <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[2], 4, nchar(x[2]))))
+rec_sc        <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[3], 4, nchar(x[3]))))
+initNage   <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[4], 4, nchar(x[4]))))
+obsErr     <- unlist(lapply( strsplit( scenario, "_"), function(x) substr(x[5], 4, nchar(x[4]))))
+
+out.iters <- cbind( assessment, rule, rec_sc, initNage, obsErr, out.all)
+#change units of variables of interest
+out.iters[,15] <- out.iters[,15]/1000000
+out.iters[,11] <- out.iters[,11]/1000
+out.iters[,16] <- out.iters[,16]/1000
+
+# reshape data 
+out.iters <- melt(out.iters,id=1:9,variable.name = "indicator")
+out.iters <- subset(out.iters,indicator %in% c("catch","f","rec","ssb"))
+out.iters$indicator2 <- factor(out.iters$indicator,levels=c("rec","ssb","f","catch"))
+out.iters <- subset(out.iters,assessment=="ss3")
+
+##Now for the plots
 ###For HCR1 and HCR2
 gg <- subset(ww, rule %in% c(1:2))
+aa <- subset(out.iters, rule %in% c(1:2))
 
 for (rr in c("med","low","lowmed","mix")){
   aux <- subset(gg,rec==rr)
+  aux.iters <- subset(aa,rec_sc==rr)
   p <- ggplot(data=aux,aes(x=year, y=q50))+
     geom_ribbon(data=aux,aes(ymin = q05, ymax = q95),alpha=0.2,show.legend = F,fill="#F9840044") +
     geom_line(data=aux,color="#F98400")+
+    geom_line(data=subset(aux.iters,iter==45),color="green3",aes(x=year,y=value),alpha=0.6)+
+    geom_line(data=subset(aux.iters,iter==235),color="blue",aes(x=year,y=value),alpha=0.6)+
     facet_grid(indicator2~rule,scales="free",labeller = as_labeller(facet_names))+
-    geom_vline(xintercept = 2018, linetype = "longdash",color="#00A08A")+
+    geom_vline(xintercept = 2018, linetype = "dotted",color="#00A08A")+
     ylab("") +
     scale_x_continuous(name="Year",breaks = seq(1978,2048,5))+
     scale_y_continuous(breaks=scales::pretty_breaks(n = 6))
+    
   
   p + geom_hline(aes(yintercept = 337.448), data = subset(gg, indicator=="ssb"),linetype="dashed",color="#00A08A") +
     geom_hline(aes(yintercept = 196.334), data = subset(gg,indicator=="ssb"),linetype="dashed",color="#00A08A")
   
-  #ggsave(paste0(rr,"_HCR12.pdf"))
+  ggsave(paste0(rr,"_HCR12.pdf"))
 }
 
 ###For HCR5 and HCR6
 gg <- subset(ww, rule %in% c(5:6))
+aa <- subset(out.iters, rule %in% c(5:6))
 
 for (rr in c("med","low","lowmed","mix")){
   aux <- subset(gg,rec==rr)
+  aux.iters <- subset(aa,rec_sc==rr)
   p <- ggplot(data=aux,aes(x=year, y=q50))+
     geom_ribbon(data=aux,aes(ymin = q05, ymax = q95),alpha=0.2,show.legend = F,fill="#F9840044") +
     geom_line(data=aux,color="#F98400")+
+    geom_line(data=subset(aux.iters,iter==45),color="green3",aes(x=year,y=value),alpha=0.6)+
+    geom_line(data=subset(aux.iters,iter==235),color="blue",aes(x=year,y=value),alpha=0.6)+
     facet_grid(indicator2~rule,scales="free",labeller = as_labeller(facet_names))+
-    geom_vline(xintercept = 2018, linetype = "longdash",color="#00A08A")+
+    geom_vline(xintercept = 2018, linetype = "dotted",color="#00A08A")+
     ylab("") +
     scale_x_continuous(name="Year",breaks = seq(1978,2048,5))+
     scale_y_continuous(breaks=scales::pretty_breaks(n = 6))
@@ -277,19 +317,23 @@ for (rr in c("med","low","lowmed","mix")){
   p + geom_hline(aes(yintercept = 337.448), data = subset(gg, indicator=="ssb"),linetype="dashed",color="#00A08A") +
     geom_hline(aes(yintercept = 196.334), data = subset(gg,indicator=="ssb"),linetype="dashed",color="#00A08A")
   
-  #ggsave(paste0(rr,"_HCR56.pdf"))
+  ggsave(paste0(rr,"_HCR56.pdf"))
 }
 
 ###For HCR3 and HCR4
 gg <- subset(ww, rule %in% c(3:4))
+aa <- subset(out.iters, rule %in% c(3:4))
 
 for (rr in c("med","low","lowmed","mix")){
   aux <- subset(gg,rec==rr)
+  aux.iters <- subset(aa,rec_sc==rr)
   p <- ggplot(data=aux,aes(x=year, y=q50))+
     geom_ribbon(data=aux,aes(ymin = q05, ymax = q95),alpha=0.2,show.legend = F,fill="#F9840044") +
     geom_line(data=aux,color="#F98400")+
+    geom_line(data=subset(aux.iters,iter==45),color="green3",aes(x=year,y=value),alpha=0.6)+
+    geom_line(data=subset(aux.iters,iter==235),color="blue",aes(x=year,y=value),alpha=0.6)+
     facet_grid(indicator2~rule,scales="free",labeller = as_labeller(facet_names))+
-    geom_vline(xintercept = 2018, linetype = "longdash",color="#00A08A")+
+    geom_vline(xintercept = 2018, linetype = "dotted",color="#00A08A")+
     ylab("") +
     scale_x_continuous(name="Year",breaks = seq(1978,2048,5))+
     scale_y_continuous(breaks=scales::pretty_breaks(n = 6))
@@ -297,7 +341,7 @@ for (rr in c("med","low","lowmed","mix")){
   p + geom_hline(aes(yintercept = 337.448), data = subset(gg, indicator=="ssb"),linetype="dashed",color="#00A08A") +
     geom_hline(aes(yintercept = 196.334), data = subset(gg,indicator=="ssb"),linetype="dashed",color="#00A08A")
   
-  #ggsave(paste0(rr,"_HCR34.pdf"))
+  ggsave(paste0(rr,"_HCR34.pdf"))
 }
 
 #==============================================================================
@@ -393,3 +437,4 @@ ggplot(data=ss)+
   ylab("P(B1+>=0.8*Blim)")+xlab("Year")+
   scale_x_continuous(name="Year",breaks = seq(1978,2048,5))
 ggsave("p80blim_HCR34.pdf")
+
