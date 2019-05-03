@@ -360,7 +360,8 @@ for (scenario in scenario_list){
     summarize(pblim=sum(biomass>=337448)/length(biomass),
               p80blim=sum(biomass>= 0.8 * 337448)/length(biomass),
               pblow=sum(biomass>=196334)/length(biomass),
-              p80blow=sum(biomass>= 0.8 * 196334)/length(biomass))
+              p80blow=sum(biomass>= 0.8 * 196334)/length(biomass),
+              pzero=sum(catch<= 1e-6)/length(catch))
   aux$scenario <- rep(scenario,length(aux))
   successyr <- rbind(successyr, as.data.frame(aux))
   }
@@ -369,7 +370,6 @@ df <- successyr%>%
   separate(scenario, into = c("Ass", "Rule", "Rec", "INN", "OER"), sep = "_", keep = TRUE)%>%
   filter(Ass=="ASSss3")
 
-library(patchwork)
 df$Rec2 <- factor(df$Rec, levels=c("RECmed","REClow","REClowmed","RECmix"))
 
 ss <- subset(df, Rule %in% c("HCR1","HCR2"))
@@ -438,3 +438,29 @@ ggplot(data=ss)+
   scale_x_continuous(name="Year",breaks = seq(1978,2048,5))
 ggsave("p80blim_HCR34.pdf")
 
+####
+ss <- subset(df, Rec=="REClow" & Rule %in% c("HCR1","HCR2"))
+maxP <- max(ss$pzero)
+
+ggplot(data=ss)+
+  geom_line(aes(x=year,y=pzero))+
+  facet_grid(Rule~.)+
+  #geom_hline(yintercept = 0.90, linetype = "longdash")+
+  #ylim(c(0,maxP))+
+  ylim(c(0,1))+
+  ylab("P(TAC = 0)")+xlab("Year")+
+  scale_x_continuous(name="Year",breaks = seq(1978,2048,5))
+ggsave("pzero_HCR12.pdf")
+
+ss <- subset(df, Rec=="REClow" & Rule %in% c("HCR3","HCR4"))
+maxP <- max(ss$pzero)
+
+ggplot(data=ss)+
+  geom_line(aes(x=year,y=pzero))+
+  facet_grid(Rule~.)+
+  #geom_hline(yintercept = 0.90, linetype = "longdash")+
+  #ylim(c(0,maxP))+
+  ylim(c(0,1))+
+  ylab("P(TAC = 0)")+xlab("Year")+
+  scale_x_continuous(name="Year",breaks = seq(1978,2048,5))
+ggsave("pzero_HCR34.pdf")
