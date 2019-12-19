@@ -1,0 +1,26 @@
+Rec,REClow,REClow,REClow,REClow,REClow,REClow,REClow
+Rule,HCR4,HCR12,HCR4,HCR4,HCR4,HCR4,HCR8
+Ftgt,Ftgt0.063,Ftgt0.064,Ftgt0.0643,Ftgt0.0644,Ftgt0.0645,Ftgt0.065,Ftgt0.08
+round(Median_B1plus[period == \initial\"]/1000,202.406,202.422,200.614,200.929,200.608,200.575,196.956
+round(Median_B1plus[period == \short\"]/1000,232.777,232.265,231.94,232.714,231.723,231.347,224.612
+round(Median_B1plus[period == \last\"]/1000,268.098,266.33,266.264,265.845,265.691,265.811,252.576
+round(Median_F[period == \initial\"],0.067,0.068,0.068,0.068,0.068,0.069,0.085
+round(Median_F[period == \short\"],0.070 ,0.071,0.071,0.071,0.071,0.072,0.089
+round(Median_F[period == \last\"],0.085,0.087,0.087,0.088,0.088,0.089,0.111
+round(Median_Catch[period == \initial\"]/1000,12.553,12.805,12.828,12.861,12.869,12.847,15.569
+round(Median_Catch[period == \short\"]/1000,14.937,15.170 ,15.188,15.304,15.264,15.289,18.188
+round(Median_Catch[period == \last\"]/1000,21.049,21.367,21.433,21.447,21.463,21.664,25.422
+round(IAV1_Catch[period == \initial\"]/1000,2.015,2.039,2.043,2.066,2.018,2.042,2.521
+round(IAV1_Catch[period == \short\"]/1000,2.129,2.141,2.152,2.191,2.145,2.175,2.684
+round(IAV1_Catch[period == \last\"]/1000,2.597,2.678,2.656,2.658,2.655,2.688,3.317
+round(closure[period == \initial\"] * 100,0,0,0,0,0,0,0
+round(closure[period == \short\"] * 100,0,0,0,0,0,0,0
+round(closure[period == \last\"] * 100,0,0,0,0,0,0,0
+round(P_B1plus_0.8Blim[period == \initial\"] * 100,28,28,28,28,27,28,23
+round(P_B1plus_0.8Blow[period == \initial\"] * 100,92,92,92,92,92,92,89
+round(firstyear_B1plus_0.8Blim[period == \all\"],NA,NA,NA,NA,NA,NA,NA
+round(firstyear_B1plus_0.8Blow[period == \all\"],2023,2023,2023,2023,2023,2023,2024
+round(firstyear_B1plus_Blim[period == \all\"],NA,NA,NA,NA,NA,NA,NA
+round(firstyear_B1plus_Blow[period == \all\"],2031,2031,2031,2031,2032,2032,NA
+round(max_P_B1plus_Blim[period == \last\"] * 100,92,93,93,93,93,93,95
+round(max_P_B1plus_Blow[period == \last\"] * 100,5,5,5.1,6,5.8,6.1,13.4
